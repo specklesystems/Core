@@ -27,7 +27,7 @@ namespace Objects.Geometry
     /// </summary>
     [DetachProperty]
     [Chunkable(200)]
-    public List<Surface> Surfaces { get; set; }
+    public List<ISurface> Surfaces { get; set; }
 
     /// <summary>
     /// Gets or sets the list of 3-dimensional curves in this <see cref="Brep"/> instance.
@@ -93,7 +93,7 @@ namespace Objects.Geometry
     /// </summary>
     public Brep()
     {
-      Surfaces = new List<Surface>();
+      Surfaces = new List<ISurface>();
       Curve2D = new List<ICurve>();
       Curve3D = new List<ICurve>();
 
@@ -170,7 +170,7 @@ namespace Objects.Geometry
     }
 
     [JsonIgnore] public BrepLoop OuterLoop => Brep.Loops[OuterLoopIndex];
-    [JsonIgnore] public Surface Surface => Brep.Surfaces[SurfaceIndex];
+    [JsonIgnore] public ISurface Surface => Brep.Surfaces[SurfaceIndex];
     [JsonIgnore] public List<BrepLoop> Loops => LoopIndices.Select(i => Brep.Loops[i]).ToList();
   }
 

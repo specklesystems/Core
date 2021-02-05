@@ -60,6 +60,12 @@ namespace Objects.Converter.Revit
       return pointToSpeckle;
     }
 
+    public Vector VectorToSpeckle(XYZ pt)
+    {
+        var extPt = ToExternalCoordinates(pt);
+        var pointToSpeckle = new Vector(ScaleToSpeckle(extPt.X), ScaleToSpeckle(extPt.Y), ScaleToSpeckle(extPt.Z), ModelUnits);
+        return pointToSpeckle;
+    }
     public XYZ VectorToNative(Vector pt)
     {
       var revitVector = new XYZ(ScaleToNative(pt.x, pt.units), ScaleToNative(pt.y, pt.units), ScaleToNative(pt.z, pt.units));
@@ -734,7 +740,7 @@ namespace Objects.Converter.Revit
       var brepEdges = new List<DB.BRepBuilderGeometryId>[brep.Edges.Count];
       foreach (var face in brep.Faces)
       {
-        var faceId = builder.AddFace(SurfaceToNative(face.Surface), face.OrientationReversed);
+        var faceId = builder.AddFace(SurfaceToNative(face.Surface as Surface), face.OrientationReversed);
 
         foreach (var loop in face.Loops)
         {
@@ -792,7 +798,15 @@ namespace Objects.Converter.Revit
 
     public Brep BrepToSpeckle(Solid solid, string units = null)
     {
+      
 #if REVIT2021
+      throw new Exception("Converting BREPs to Speckle is currently only supported in Revit 2021.");
+#elif REVIT2020
+      throw new Exception("Converting BREPs to Speckle is currently only supported in Revit 2021.");
+#elif REVIT2019
+      throw new Exception("Converting BREPs to Speckle is currently only supported in Revit 2021.");
+#else
+
       // TODO: Incomplete implementation!!
       var u = units ?? ModelUnits;
       var brep = new Brep();
@@ -906,8 +920,6 @@ namespace Objects.Converter.Revit
       brep.Loops = speckleLoops;
       brep.displayValue = mesh;
       return brep;
-#else
-      throw new Exception("Converting BREPs to Speckle is currently only supported in Revit 2021.");
 #endif
     }
 
@@ -929,10 +941,31 @@ namespace Objects.Converter.Revit
         default: throw new NotImplementedException();
       }
     }
-    public Surface FaceToSpeckle(PlanarFace planarFace, double tolerance, string units = null)
+
+
+    public PlanarSurface SpeckleSurfaceFromPlane(DB.XYZ origin, DB.XYZ xDir, DB.XYZ yDir, DB.XYZ zDir, DB.BoundingBoxUV bboxUV, double tolerance)
     {
-      throw new NotImplementedException();
+      var uDomain = new Interval(bboxUV.Min.U, bboxUV.Max.U);
+      var vDomain = new Interval(bboxUV.Min.V, bboxUV.Max.V);
+      
+      var plane = new Plane(
+        PointToSpeckle(origin), 
+        VectorToSpeckle(zDir), 
+        VectorToSpeckle(xDir), 
+        VectorToSpeckle(yDir),
+        ModelUnits);
+
+      return new PlanarSurface(plane, uDomain, vDomain);
     }
+
+    public PlanarSurface PlanarSurfaceToSpeckle(DB.Plane surface, DB.BoundingBoxUV bboxUV) =>
+      SpeckleSurfaceFromPlane(surface.Origin, surface.XVec, surface.YVec, surface.Normal, bboxUV, 0.0);
+    
+    public PlanarSurface FaceToSpeckle(PlanarFace planarFace, double tolerance) =>
+      SpeckleSurfaceFromPlane(planarFace.Origin, planarFace.XVector, planarFace.YVector, planarFace.FaceNormal,
+        planarFace.GetBoundingBox(), tolerance);
+
+    
     public Surface FaceToSpeckle(ConicalFace conicalFace, double tolerance, string units = null)
     {
       throw new NotImplementedException();

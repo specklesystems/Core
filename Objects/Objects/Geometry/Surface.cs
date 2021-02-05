@@ -6,7 +6,13 @@ using Speckle.Core.Kits;
 namespace Objects.Geometry
 {
   //TODO: to finish
-  public class Surface : Base, IHasBoundingBox, IHasArea
+  public interface ISurface: IHasBoundingBox, IHasArea
+  {
+    Interval domainU { get; set; }
+    Interval domainV { get; set; }
+  }
+  
+  public class Surface : Base, ISurface
   {
     public int degreeU { get; set; }
     public int degreeV { get; set; }

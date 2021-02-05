@@ -733,7 +733,7 @@ namespace Objects.Converter.RhinoGh
         return crv;
       }).ToList();
       spcklBrep.Surfaces = brep.Surfaces
-        .Select(srf => SurfaceToSpeckle(srf.ToNurbsSurface(), u)).ToList();
+        .Select(srf => (ISurface)SurfaceToSpeckle(srf.ToNurbsSurface(), u)).ToList();
       spcklBrep.IsClosed = brep.IsSolid;
       spcklBrep.Orientation = (BrepOrientation)brep.SolidOrientation;
 
@@ -814,7 +814,7 @@ namespace Objects.Converter.RhinoGh
         var newBrep = new RH.Brep();
         brep.Curve3D.ForEach(crv => newBrep.AddEdgeCurve(CurveToNative(crv)));
         brep.Curve2D.ForEach(crv => newBrep.AddTrimCurve(CurveToNative(crv)));
-        brep.Surfaces.ForEach(surf => newBrep.AddSurface(SurfaceToNative(surf)));
+        brep.Surfaces.ForEach(surf => newBrep.AddSurface(SurfaceToNative(surf as Geometry.Surface)));
         brep.Vertices.ForEach(vert => newBrep.Vertices.Add(PointToNative(vert).Location, tol));
         brep.Edges.ForEach(edge =>
         {
