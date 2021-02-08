@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Grasshopper.Kernel.Types.Transforms;
 using Rhino;
 using Arc = Objects.Geometry.Arc;
 using Box = Objects.Geometry.Box;
@@ -726,7 +727,6 @@ namespace Objects.Converter.RhinoGh
       spcklBrep.Curve2D = brep.Curves2D.ToList().Select(c =>
       {
         var nurbsCurve = c.ToNurbsCurve();
-        //nurbsCurve.Knots.RemoveMultipleKnots(1, nurbsCurve.Degree, Doc.ModelAbsoluteTolerance );
         var rebuild = nurbsCurve.Rebuild(nurbsCurve.Points.Count,nurbsCurve.Degree,true);
         
         var crv = CurveToSpeckle(rebuild, Units.None);
@@ -812,7 +812,7 @@ namespace Objects.Converter.RhinoGh
         //                       ". Don't know how to convert from one to the other.");
 
         var newBrep = new RH.Brep();
-        brep.Curve3D.ForEach(crv => newBrep.AddEdgeCurve(CurveToNative(crv)));
+        //brep.Curve3D.ForEach(crv => newBrep.AddEdgeCurve(CurveToNative(crv)));
         brep.Curve2D.ForEach(crv => newBrep.AddTrimCurve(CurveToNative(crv)));
         brep.Surfaces.ForEach(surf => newBrep.AddSurface(SurfaceToNative(surf as Geometry.Surface)));
         brep.Vertices.ForEach(vert => newBrep.Vertices.Add(PointToNative(vert).Location, tol));
@@ -1095,6 +1095,11 @@ namespace Objects.Converter.RhinoGh
           result.Points.SetPoint(i, j, pt.x * pt.weight, pt.y * pt.weight, pt.z * pt.weight);
           result.Points.SetWeight(i, j, pt.weight);
         }
+
+        if (surface.domainU != null) result.SetDomain(0,IntervalToNative(surface.domainU));
+        if (surface.domainV != null) result.SetDomain(1,IntervalToNative(surface.domainV));
+        // Return surface
+        return result;
       }
 
       // Return surface

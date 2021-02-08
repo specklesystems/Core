@@ -14761,7 +14761,7 @@ FaceWithTrimmedEdge</item>
                             <item name="Name" type_name="gh_string" type_code="10">Branch {0;9}</item>
                             <item name="NickName" type_name="gh_string" type_code="10">{0;9}</item>
                             <item name="Optional" type_name="gh_bool" type_code="1">true</item>
-                            <item name="Source" index="0" type_name="gh_guid" type_code="9">ca1f88b6-9411-4222-babf-0998c690d15b</item>
+                            <item name="Source" index="0" type_name="gh_guid" type_code="9">ac9de62f-2e48-4de3-9232-8e7ac3e90729</item>
                             <item name="SourceCount" type_name="gh_int32" type_code="3">1</item>
                           </items>
                           <chunks count="1">
@@ -15295,9 +15295,8 @@ FaceWithTrimmedEdge</item>
               </items>
               <chunks count="1">
                 <chunk name="Container">
-                  <items count="5">
+                  <items count="4">
                     <item name="Description" type_name="gh_string" type_code="10">Serializes a Speckle object to a JSON string</item>
-                    <item name="Hidden" type_name="gh_bool" type_code="1">true</item>
                     <item name="InstanceGuid" type_name="gh_guid" type_code="9">4daf10d7-5d72-4745-be4a-5c98e9c54c14</item>
                     <item name="Name" type_name="gh_string" type_code="10">Serialize</item>
                     <item name="NickName" type_name="gh_string" type_code="10">SRL</item>

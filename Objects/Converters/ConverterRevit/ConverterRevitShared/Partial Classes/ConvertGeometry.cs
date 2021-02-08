@@ -7,12 +7,14 @@ using System.Collections.Generic;
 using System.Linq;
 using Arc = Objects.Geometry.Arc;
 using Curve = Objects.Geometry.Curve;
+using CylindricalSurface = Objects.Geometry.Surfaces.CylindricalSurface;
 using DB = Autodesk.Revit.DB;
 using Ellipse = Objects.Geometry.Ellipse;
 using Line = Objects.Geometry.Line;
 using Mesh = Objects.Geometry.Mesh;
 using Plane = Objects.Geometry.Plane;
 using Point = Objects.Geometry.Point;
+using RuledSurface = Objects.Geometry.RuledSurface;
 using Surface = Objects.Geometry.Surface;
 using Units = Speckle.Core.Kits.Units;
 
@@ -229,7 +231,7 @@ namespace Objects.Converter.Revit
       speckleCurve.rational = revitCurve.isRational;
       speckleCurve.closed = RevitVersionHelper.IsCurveClosed(revitCurve);
       speckleCurve.units = units ?? ModelUnits;
-      //speckleCurve.domain = new Interval(revitCurve.StartParameter(), revitCurve.EndParameter());
+      speckleCurve.domain = new Interval(revitCurve.GetEndParameter(0), revitCurve.GetEndParameter(1));
       speckleCurve.length = revitCurve.Length;
 
       return speckleCurve;
@@ -513,7 +515,6 @@ namespace Objects.Converter.Revit
 
     public Geometry.Surface FaceToSpeckle(DB.Face face, DB.BoundingBoxUV uvBox, string units = null)
     {
-
 #if REVIT2021
       var surf = DB.ExportUtils.GetNurbsSurfaceDataForSurface(face.GetSurface());
 #else
@@ -568,7 +569,6 @@ namespace Objects.Converter.Revit
       }
 
       result.SetControlPoints(points);
-
       return result;
     }
 
@@ -691,14 +691,74 @@ namespace Objects.Converter.Revit
       return knots;
     }
 
-    public BRepBuilderSurfaceGeometry SurfaceToNative(Surface surface)
+    public BRepBuilderSurfaceGeometry SurfaceToNative(ISurface surface)
     {
-      var uvBox = new DB.BoundingBoxUV(surface.knotsU[0], surface.knotsV[0], surface.knotsU[surface.knotsU.Count - 1], surface.knotsV[surface.knotsV.Count - 1]);
+      switch (surface)
+      {
+        case Surface nurbsSurf:
+          return NurbsSurfaceToNative(nurbsSurf);
+        case PlanarSurface pSurf:
+          return PlanarSurfaceToNative(pSurf);
+        case RuledSurface rSurf:
+          return RuledSurfaceToNative(rSurf);
+        case CylindricalSurface cSurf:
+          return CylindricalSurfaceToNative(cSurf);
+        default:
+          throw new NotImplementedException();
+      }
+    }
+
+    private BRepBuilderSurfaceGeometry CylindricalSurfaceToNative(CylindricalSurface cSurf)
+    {
+      using(var frame = new DB.Frame(PointToNative(cSurf.origin), VectorToNative(cSurf.radiusVectorX), VectorToNative(cSurf.radiusVectorY), VectorToNative(cSurf.axis)))
+        using(DB.Surface surf = DB.CylindricalSurface.Create(frame, VectorToNative(cSurf.radiusVectorX).GetLength()))
+            return BRepBuilderSurfaceGeometry.Create(surf, null);
+    }
+
+    private BRepBuilderSurfaceGeometry RuledSurfaceToNative(RuledSurface rSurf)
+    {
+      DB.Surface rvtSurf = null;
+      if (rSurf.curves[0] != null && rSurf.curves[1] != null)
+      {
+        rvtSurf = DB.RuledSurface.Create(
+          CurveToNative(rSurf.curves[0]).get_Item(0),
+          CurveToNative(rSurf.curves[1]).get_Item(0));
+      }
+      else if ((rSurf.curves[0] != null || rSurf.curves[1] != null) && (rSurf.pointA != null || rSurf.pointB != null))
+      {
+        var pt = rSurf.pointA ?? rSurf.pointB;
+        var crv = rSurf.curves[0] ?? rSurf.curves[1];
+        rvtSurf = DB.RuledSurface.Create(CurveToNative(crv).get_Item(0), PointToNative(pt));
+      }
+      else
+      {
+        throw new Exception("Ruled surface was invalid!");
+      }
+#if REVIT2021
+      return BRepBuilderSurfaceGeometry.Create(rvtSurf, null);;
+#else
+      return BRepBuilderSurfaceGeometry.Create(rvtSurf, null);
+#endif
+    }
+
+    private BRepBuilderSurfaceGeometry PlanarSurfaceToNative(PlanarSurface planarSurface)
+    {
+      var rvtSurf = DB.Plane.CreateByOriginAndBasis(
+        PointToNative(planarSurface.origin.origin),
+        VectorToNative(planarSurface.origin.xdir), 
+        VectorToNative(planarSurface.origin.ydir));
+      return BRepBuilderSurfaceGeometry.Create(rvtSurf, new BoundingBoxUV(planarSurface.domainU.start ?? 0,planarSurface.domainV.start ?? 0,planarSurface.domainU.end ?? 1,planarSurface.domainV.end ?? 1));
+    }
+    
+    private BRepBuilderSurfaceGeometry NurbsSurfaceToNative(Surface surface)
+    {
+      var uvBox = new DB.BoundingBoxUV(surface.knotsU[0], surface.knotsV[0], surface.knotsU[surface.knotsU.Count - 1],
+        surface.knotsV[surface.knotsV.Count - 1]);
       var surfPts = surface.GetControlPoints();
       var uKnots = SurfaceKnotsToNative(surface.knotsU);
       var vKnots = SurfaceKnotsToNative(surface.knotsV);
       var cPts = ControlPointsToNative(surfPts);
-
+    
       BRepBuilderSurfaceGeometry result;
       if (!surface.rational)
       {
@@ -740,7 +800,7 @@ namespace Objects.Converter.Revit
       var brepEdges = new List<DB.BRepBuilderGeometryId>[brep.Edges.Count];
       foreach (var face in brep.Faces)
       {
-        var faceId = builder.AddFace(SurfaceToNative(face.Surface as Surface), face.OrientationReversed);
+        var faceId = builder.AddFace(SurfaceToNative(face.Surface), face.OrientationReversed);
 
         foreach (var loop in face.Loops)
         {
@@ -789,7 +849,7 @@ namespace Objects.Converter.Revit
       var removedFace = builder.RemovedSomeFaces();
       var bRepBuilderOutcome = builder.Finish();
       if (bRepBuilderOutcome == BRepBuilderOutcome.Failure) return null;
-
+      
       var isResultAvailable = builder.IsResultAvailable();
       if (!isResultAvailable) return null;
       var result = builder.GetResult();
@@ -799,14 +859,9 @@ namespace Objects.Converter.Revit
     public Brep BrepToSpeckle(Solid solid, string units = null)
     {
       
-#if REVIT2021
-      throw new Exception("Converting BREPs to Speckle is currently only supported in Revit 2021.");
-#elif REVIT2020
-      throw new Exception("Converting BREPs to Speckle is currently only supported in Revit 2021.");
-#elif REVIT2019
+#if !REVIT2021
       throw new Exception("Converting BREPs to Speckle is currently only supported in Revit 2021.");
 #else
-
       // TODO: Incomplete implementation!!
       var u = units ?? ModelUnits;
       var brep = new Brep();
@@ -901,7 +956,7 @@ namespace Objects.Converter.Revit
         }
 
         speckleFaces.Add(face,
-          new BrepFace(brep, surfaceIndex, loopIndices, loopIndices[0], !face.OrientationMatchesSurfaceOrientation));
+          new BrepFace(brep, surfaceIndex, loopIndices, loopIndices[0], !orientation));
         faceIndex++;
         brep.Surfaces.Add(surface);
         surfaceIndex++;
@@ -928,7 +983,7 @@ namespace Objects.Converter.Revit
       var u = units ?? ModelUnits;
       using (var surface = face.GetSurface())
         parametricOrientation = surface.OrientationMatchesParametricOrientation;
-
+      
       switch (face)
       {
         case null: return null;
@@ -972,7 +1027,14 @@ namespace Objects.Converter.Revit
     }
     public Surface FaceToSpeckle(CylindricalFace cylindricalFace, double tolerance, string units = null)
     {
-      throw new NotImplementedException();
+      return new CylindricalSurface()
+      {
+        origin = PointToSpeckle(cylindricalFace.Origin),
+        axis = VectorToSpeckle(cylindricalFace.Axis),
+        radiusVectorX = VectorToSpeckle(cylindricalFace.get_Radius(0)),
+        radiusVectorY = VectorToSpeckle(cylindricalFace.get_Radius(1))
+        
+      };
     }
     public Surface FaceToSpeckle(RevolvedFace revolvedFace, double tolerance, string units = null)
     {
@@ -980,7 +1042,25 @@ namespace Objects.Converter.Revit
     }
     public Surface FaceToSpeckle(RuledFace ruledFace, double tolerance, string units = null)
     {
-      throw new NotImplementedException();
+#if REVIT2021
+      var surf = DB.ExportUtils.GetNurbsSurfaceDataForSurface(ruledFace.GetSurface());
+#else
+      var surf = DB.ExportUtils.GetNurbsSurfaceDataForFace(ruledFace);
+#endif
+      var spcklSurface = NurbsSurfaceToSpeckle(surf, ruledFace.GetBoundingBox());
+      return spcklSurface;
+      /*var bboxUV = ruledFace.GetBoundingBox();
+      var spcklSurf = new RuledSurface
+      {
+        isExtruded = ruledFace.IsExtruded,
+        curves = new List<ICurve> {CurveToSpeckle(ruledFace.get_Curve(0)), CurveToSpeckle(ruledFace.get_Curve(1))},
+        pointA = ruledFace.get_Curve(0) is null ? PointToSpeckle(ruledFace.get_Point(0)) : null,
+        pointB = ruledFace.get_Curve(1) is null ? PointToSpeckle(ruledFace.get_Point(1)) : null,
+        units = ModelUnits,
+        domainU = new Interval(bboxUV.Min.U, bboxUV.Max.U),
+        domainV = new Interval(bboxUV.Min.V, bboxUV.Max.V)
+      };
+      return spcklSurf;*/
     }
 
     public int AddSurface(Brep brep, DB.Face face, out List<BrepBoundary>[] shells,

@@ -79,17 +79,24 @@ namespace ConverterRevitTests
     [Trait("Brep", "Selection")]
     public void BrepSelectionToNative()
     {
-      var converter = new ConverterRevit();
-      converter.SetContextDocument(fixture.NewDoc);
 
       if(!(fixture.Selection[0] is DirectShape ds))
         throw new Exception("Selected object was not a direct shape.");
       var geo = ds.get_Geometry(new Options());
       if(!(geo.First() is Solid solid))
         throw new Exception("DS was not composed of a solid.");
-      var converted = converter.BrepToSpeckle(solid);
-      var nativeconverted = converter.BrepToNative(converted);
-      Assert.NotNull(nativeconverted);
+      DirectShape nativeConverted = null;
+      xru.RunInTransaction(() =>
+      {
+
+        var converter = new ConverterRevit();
+        converter.SetContextDocument(fixture.NewDoc);
+        var converted = converter.BrepToSpeckle(solid);
+        nativeConverted = converter.BrepToDirectShape(converted);
+      }, fixture.NewDoc ).Wait();
+      Assert.NotNull(nativeConverted);
+      Assert.True(nativeConverted.get_Geometry(new Options()).First() is Solid);
+
     }
     
   }
