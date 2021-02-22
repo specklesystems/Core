@@ -6,8 +6,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Objects.Geometry;
+using Speckle.Core.Logging;
 using DB = Autodesk.Revit.DB;
 using Mesh = Objects.Geometry.Mesh;
+using Surface = Objects.Geometry.Surface;
 
 namespace Objects.Converter.Revit
 {
@@ -141,45 +144,53 @@ namespace Objects.Converter.Revit
       return null;
     }
 
-    private string CreateMassFamily(string famPath, Geometry.Surface surface, string name)
+    private string CreateMassFamily(string famPath, ISurface iSurface, string name)
     {
       var famDoc = Doc.Application.NewFamilyDocument(famPath);
 
-
-      using (Transaction t = new Transaction(famDoc, "Create Mass"))
+      if (iSurface is Surface surface)
       {
-        t.Start();
-
-        try
+        using (Transaction t = new Transaction(famDoc, "Create Mass"))
         {
-          var pointLists = surface.GetControlPoints();
-          var curveArray = new ReferenceArrayArray();
+          t.Start();
 
-          foreach (var list in pointLists)
+          try
           {
-            var arr = new ReferencePointArray();
-            foreach (var point in list)
+            var pointLists = surface.GetControlPoints();
+            var curveArray = new ReferenceArrayArray();
+
+            foreach (var list in pointLists)
             {
-              var refPt = famDoc.FamilyCreate.NewReferencePoint(PointToNative(point));
-              arr.Append(refPt);
+              var arr = new ReferencePointArray();
+              foreach (var point in list)
+              {
+                var refPt = famDoc.FamilyCreate.NewReferencePoint(PointToNative(point));
+                arr.Append(refPt);
+              }
+
+              var curve = famDoc.FamilyCreate.NewCurveByPoints(arr);
+              var referenceArray = new ReferenceArray();
+              referenceArray.Append(curve.GeometryCurve.Reference);
+              curveArray.Append(referenceArray);
             }
 
-            var curve = famDoc.FamilyCreate.NewCurveByPoints(arr);
-            var referenceArray = new ReferenceArray();
-            referenceArray.Append(curve.GeometryCurve.Reference);
-            curveArray.Append(referenceArray);
+            var loft = famDoc.FamilyCreate.NewLoftForm(true, curveArray);
+          }
+          catch (Exception e)
+          {
+
           }
 
-          var loft = famDoc.FamilyCreate.NewLoftForm(true, curveArray);
-        }
-        catch (Exception e)
-        {
+          t.Commit();
 
         }
-
-        t.Commit();
-
       }
+      else
+      {
+        throw new SpeckleException("Only NurbsSurfaces are supported for now.");
+      }
+      
+
       var famName = "SpeckleMass_" + name;
       string tempFamilyPath = Path.Combine(Path.GetTempPath(), famName + ".rfa");
       SaveAsOptions so = new SaveAsOptions();

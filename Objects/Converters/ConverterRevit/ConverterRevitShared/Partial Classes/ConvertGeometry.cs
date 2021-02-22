@@ -978,7 +978,7 @@ namespace Objects.Converter.Revit
 #endif
     }
 
-    public Surface FaceToSpeckle(DB.Face face, out bool parametricOrientation, double relativeTolerance = 0.0, string units = null)
+    public ISurface FaceToSpeckle(DB.Face face, out bool parametricOrientation, double relativeTolerance = 0.0, string units = null)
     {
       var u = units ?? ModelUnits;
       using (var surface = face.GetSurface())
@@ -997,8 +997,15 @@ namespace Objects.Converter.Revit
       }
     }
 
+    public PlanarSurface SurfaceToSpeckle(DB.Plane surface, DB.BoundingBoxUV bboxUV) =>
+      SpeckleSurfaceFromPlane(surface.Origin, surface.XVec, surface.YVec, surface.Normal, bboxUV, 0.0);
 
-    public PlanarSurface SpeckleSurfaceFromPlane(DB.XYZ origin, DB.XYZ xDir, DB.XYZ yDir, DB.XYZ zDir, DB.BoundingBoxUV bboxUV, double tolerance)
+    public CylindricalSurface SurfaceToSpeckle(DB.CylindricalSurface surface, DB.BoundingBoxUV bboxUV)
+    {
+      return SpeckleSurfaceFromCylinder(surface.Origin,surface.Axis,surface.XDir,surface.YDir, surface.Radius, null);
+    }
+    
+    public PlanarSurface SpeckleSurfaceFromPlane(DB.XYZ origin, DB.XYZ xDir, DB.XYZ yDir, DB.XYZ zDir, DB.BoundingBoxUV bboxUV, double tolerance, string units = null)
     {
       var uDomain = new Interval(bboxUV.Min.U, bboxUV.Max.U);
       var vDomain = new Interval(bboxUV.Min.V, bboxUV.Max.V);
@@ -1013,28 +1020,24 @@ namespace Objects.Converter.Revit
       return new PlanarSurface(plane, uDomain, vDomain);
     }
 
-    public PlanarSurface PlanarSurfaceToSpeckle(DB.Plane surface, DB.BoundingBoxUV bboxUV) =>
-      SpeckleSurfaceFromPlane(surface.Origin, surface.XVec, surface.YVec, surface.Normal, bboxUV, 0.0);
+    public CylindricalSurface SpeckleSurfaceFromCylinder(DB.XYZ origin, DB.XYZ xDir, DB.XYZ yDir, DB.XYZ axis, double radius ,DB.BoundingBoxUV bboxUV, double tolerance = 0.0, string units = null)
+    {
+      return new CylindricalSurface(PointToSpeckle(origin), VectorToSpeckle(axis), VectorToSpeckle(xDir), VectorToSpeckle(yDir)){};
+    }
     
-    public PlanarSurface FaceToSpeckle(PlanarFace planarFace, double tolerance) =>
+    public PlanarSurface FaceToSpeckle(PlanarFace planarFace, double tolerance, string units = null) =>
       SpeckleSurfaceFromPlane(planarFace.Origin, planarFace.XVector, planarFace.YVector, planarFace.FaceNormal,
-        planarFace.GetBoundingBox(), tolerance);
+        planarFace.GetBoundingBox(), tolerance, units ?? ModelUnits);
 
     
     public Surface FaceToSpeckle(ConicalFace conicalFace, double tolerance, string units = null)
     {
       throw new NotImplementedException();
     }
-    public Surface FaceToSpeckle(CylindricalFace cylindricalFace, double tolerance, string units = null)
+    public CylindricalSurface FaceToSpeckle(CylindricalFace cylindricalFace, double tolerance, string units = null)
     {
-      return new CylindricalSurface()
-      {
-        origin = PointToSpeckle(cylindricalFace.Origin),
-        axis = VectorToSpeckle(cylindricalFace.Axis),
-        radiusVectorX = VectorToSpeckle(cylindricalFace.get_Radius(0)),
-        radiusVectorY = VectorToSpeckle(cylindricalFace.get_Radius(1))
-        
-      };
+      return SpeckleSurfaceFromCylinder(cylindricalFace.Origin, cylindricalFace.get_Radius(0),
+        cylindricalFace.get_Radius(1), cylindricalFace.Axis, cylindricalFace.get_Radius(0).GetLength(),cylindricalFace.GetBoundingBox());
     }
     public Surface FaceToSpeckle(RevolvedFace revolvedFace, double tolerance, string units = null)
     {

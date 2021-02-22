@@ -91,7 +91,7 @@ namespace Objects.BuiltElements.Revit
     public string family { get; set; }
     public string type { get; set; }
 
-    public Surface surface { get; set; }
+    public ISurface surface { get; set; }
     public Level level { get; set; }
 
     public LocationLine locationLine { get; set; }
@@ -113,7 +113,7 @@ namespace Objects.BuiltElements.Revit
     {
       this.family = family;
       this.type = type;
-      this.surface = surface.Surfaces[0];
+      this.surface = (ISurface)surface.Surfaces[0];
       this.locationLine = locationLine;
       this.level = level;
       this.elements = elements;
