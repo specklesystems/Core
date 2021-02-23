@@ -34,7 +34,7 @@ using Point = Objects.Geometry.Point;
 using Polyline = Objects.Geometry.Polyline;
 
 using RH = Rhino.Geometry;
-
+using Surface = Objects.Geometry.Surface;
 using Vector = Objects.Geometry.Vector;
 
 namespace Objects.Converter.RhinoGh
@@ -207,7 +207,7 @@ namespace Objects.Converter.RhinoGh
     public LineCurve LineToNative(Line line)
     {
       var myLine = new LineCurve(PointToNative(line.start).Location, PointToNative(line.end).Location);
-      myLine.Domain = line.domain == null ?  IntervalToNative(line.domain) : new RH.Interval(0, line.length);
+      myLine.Domain = line.domain != null ?  IntervalToNative(line.domain) : new RH.Interval(0, line.length);
       return myLine;
     }
 
@@ -573,9 +573,10 @@ namespace Objects.Converter.RhinoGh
         nurbsCurve.Points.SetPoint(j, ptsList[j], curve.weights[j]);
       }
 
+      var knotsHaveRhinoFormat = nurbsCurve.Knots.Count == curve.knots.Count;
       for (int j = 0; j < nurbsCurve.Knots.Count; j++)
       {
-        nurbsCurve.Knots[j] = curve.knots[j];
+        nurbsCurve.Knots[j] = curve.knots[knotsHaveRhinoFormat ? j : j+1];
       }
 
       nurbsCurve.Domain = IntervalToNative(curve.domain ?? new Interval(0, 1));
@@ -803,7 +804,7 @@ namespace Objects.Converter.RhinoGh
     /// <exception cref="Exception">Throws exception if the provenance is not Rhino</exception>
     public RH.Brep BrepToNative(Brep brep)
     {
-      var tol = RhinoDoc.ActiveDoc.ModelAbsoluteTolerance;
+      var tol = 0.0;
       try
       {
         // TODO: Provenance exception is meaningless now, must change for provenance build checks.
@@ -812,9 +813,9 @@ namespace Objects.Converter.RhinoGh
         //                       ". Don't know how to convert from one to the other.");
 
         var newBrep = new RH.Brep();
-        //brep.Curve3D.ForEach(crv => newBrep.AddEdgeCurve(CurveToNative(crv)));
+        brep.Curve3D.ForEach(crv => newBrep.AddEdgeCurve(CurveToNative(crv)));
         brep.Curve2D.ForEach(crv => newBrep.AddTrimCurve(CurveToNative(crv)));
-        brep.Surfaces.ForEach(surf => newBrep.AddSurface(SurfaceToNative(surf as Geometry.Surface)));
+        brep.Surfaces.ForEach(surf => newBrep.AddSurface(SurfaceToNative(surf)));
         brep.Vertices.ForEach(vert => newBrep.Vertices.Add(PointToNative(vert).Location, tol));
         brep.Edges.ForEach(edge =>
         {
@@ -850,7 +851,8 @@ namespace Objects.Converter.RhinoGh
             rhTrim.SetTolerances(tol, tol);
           });
         });
-
+        //newBrep.SetVertices();
+        //newBrep.SetTolerancesBoxesAndFlags(true,true,true,true,true,true,true,true);
         newBrep.Repair(tol);
 
         return newBrep;
@@ -1061,6 +1063,30 @@ namespace Objects.Converter.RhinoGh
       return true;
     }
 
+    public RH.Surface SurfaceToNative(ISurface surface)
+    {
+      RH.Surface surf = null;
+      switch (surface)
+      {
+        case PlanarSurface pSurf: 
+          surf = SurfaceToNative(pSurf);
+          break;
+        case Surface nurbsSurf:
+          surf = SurfaceToNative(nurbsSurf);
+          break;
+        case RuledSurface rSurf:
+          surf = SurfaceToNative(rSurf);
+          break;
+        case CylindricalSurface cSurf:
+          surf = SurfaceToNative(cSurf);
+          break;
+        default:
+          throw new NotImplementedException();
+      }
+
+      return surf;
+    }
+    
     public NurbsSurface SurfaceToNative(Geometry.Surface surface)
     {
       // Create rhino surface
@@ -1095,17 +1121,47 @@ namespace Objects.Converter.RhinoGh
           result.Points.SetPoint(i, j, pt.x * pt.weight, pt.y * pt.weight, pt.z * pt.weight);
           result.Points.SetWeight(i, j, pt.weight);
         }
-
-        if (surface.domainU != null) result.SetDomain(0,IntervalToNative(surface.domainU));
-        if (surface.domainV != null) result.SetDomain(1,IntervalToNative(surface.domainV));
-        // Return surface
-        return result;
       }
+      
+      if (surface.domainU != null) result.SetDomain(0,IntervalToNative(surface.domainU));
+      if (surface.domainV != null) result.SetDomain(1,IntervalToNative(surface.domainV));
 
       // Return surface
       return result;
     }
 
+    public RH.PlaneSurface SurfaceToNative(Geometry.PlanarSurface surface)
+    {
+      return new PlaneSurface(PlaneToNative(surface.origin), IntervalToNative(surface.domainU),
+        IntervalToNative(surface.domainV));
+      
+    }
+
+    public RH.Surface SurfaceToNative(Geometry.CylindricalSurface surface)
+    {
+      throw new NotImplementedException();
+    }
+
+    public RH.Extrusion SurfaceToNative(Geometry.ExtrudedSurface surface)
+    {
+      throw new NotImplementedException();
+    }
+    
+    public RH.Surface SurfaceToNative(Geometry.RuledSurface surface)
+    {
+      var rail1 = CurveToNative(surface.curves[0]);
+      var rail2 = CurveToNative(surface.curves[1]);
+      //rail2.Reverse();
+      var ptA = rail1.PointAtNormalizedLength(0.0);
+      var ptB = rail1.PointAtNormalizedLength(1.0);
+      var railed = RH.Brep.CreateFromSweep(rail1, rail2, new RH.Line(ptA, ptB).ToNurbsCurve(),false,0.0);
+      var sweep = RH.Brep.CreateFromLoft(new List<RH.Curve> {rail1, rail2}, ptA, ptB,
+        LoftType.Straight, false);
+      var first = sweep[0].Surfaces[0];
+      //first.Transpose();
+      
+      return first;
+    }
     public List<List<ControlPoint>> ControlPointsToSpeckle(NurbsSurfacePointList controlPoints, string units = null)
     {
       var points = new List<List<ControlPoint>>();

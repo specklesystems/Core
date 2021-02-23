@@ -1,4 +1,4 @@
-﻿namespace Objects.Geometry.Surfaces
+﻿namespace Objects.Geometry
 {
   public class RevolutionSurface
   {

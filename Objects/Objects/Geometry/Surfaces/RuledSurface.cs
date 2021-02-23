@@ -12,6 +12,10 @@ namespace Objects.Geometry
     public Point pointB { get; set; }
     public bool isExtruded { get; set; }
 
+    public RuledSurface()
+    {
+      
+    }
     public RuledSurface(string units = Units.Meters, string applicationId = null)
     {
       this.units = units;

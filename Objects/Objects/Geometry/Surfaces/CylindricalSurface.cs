@@ -1,10 +1,11 @@
 ﻿using Objects.Primitive;
 using Speckle.Core.Models;
 
-namespace Objects.Geometry.Surfaces
+namespace Objects.Geometry
 {
   public class CylindricalSurface: Base, ISurface
   {
+    public CylindricalSurface(){}
     public CylindricalSurface(Point origin, Vector axis, Vector radiusVectorX, Vector radiusVectorY)
     {
       this.origin = origin;

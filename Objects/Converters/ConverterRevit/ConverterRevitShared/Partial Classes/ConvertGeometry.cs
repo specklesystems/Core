@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Arc = Objects.Geometry.Arc;
 using Curve = Objects.Geometry.Curve;
-using CylindricalSurface = Objects.Geometry.Surfaces.CylindricalSurface;
+using CylindricalSurface = Objects.Geometry.CylindricalSurface;
 using DB = Autodesk.Revit.DB;
 using Ellipse = Objects.Geometry.Ellipse;
 using Line = Objects.Geometry.Line;
@@ -106,6 +106,7 @@ namespace Objects.Converter.Revit
       l.end = PointToSpeckle(line.GetEndPoint(1), u);
 
       l.length = line.Length;
+      l.domain = new Interval(0, l.length);
       return l;
     }
 
@@ -735,7 +736,7 @@ namespace Objects.Converter.Revit
         throw new Exception("Ruled surface was invalid!");
       }
 #if REVIT2021
-      return BRepBuilderSurfaceGeometry.Create(rvtSurf, null);;
+      return BRepBuilderSurfaceGeometry.Create(rvtSurf, rvtSurf.GetBoundingBoxUV());;
 #else
       return BRepBuilderSurfaceGeometry.Create(rvtSurf, null);
 #endif
@@ -796,7 +797,7 @@ namespace Objects.Converter.Revit
 
       builder.SetAllowShortEdges();
       builder.AllowRemovalOfProblematicFaces();
-
+      
       var brepEdges = new List<DB.BRepBuilderGeometryId>[brep.Edges.Count];
       foreach (var face in brep.Faces)
       {
@@ -911,7 +912,7 @@ namespace Objects.Converter.Revit
             var sTrim = new BrepTrim(brep, edgeIndex, faceIndex, loopIndex, curve2dIndex, 0, BrepTrimType.Boundary, edge.IsFlippedOnFace(edgeSide), -1, -1);
             var sTrimIndex = trimIndex;
             loopTrimIndices.Add(sTrimIndex);
-
+            
             // Add curve and trim, increase index counters.
             speckle2dCurves.Add(CurveToSpeckle(trim.As3DCurveInXYPlane(), Units.None));
             speckleTrims.Add(sTrim);
@@ -923,12 +924,13 @@ namespace Objects.Converter.Revit
             {
               // First time we visit this edge, add 3d curve and create new BrepEdge.
               var edgeCurve = edge.AsCurve();
-              speckle3dCurves[curve3dIndex] = CurveToSpeckle(edgeCurve, u);
+              var curveToSpeckle = CurveToSpeckle(edgeCurve, u);
+              speckle3dCurves[curve3dIndex] = curveToSpeckle;
               var sCurveIndex = curve3dIndex;
               curve3dIndex++;
 
               // Create a trim with just one of the trimIndices set, the second one will be set on the opposite condition.
-              var sEdge = new BrepEdge(brep, sCurveIndex, new[] { sTrimIndex }, -1, -1, edge.IsFlippedOnFace(face), null);
+              var sEdge = new BrepEdge(brep, sCurveIndex, new[] { sTrimIndex }, -1, -1, edge.IsFlippedOnFace(face), curveToSpeckle.domain);
               speckleEdges.Add(edge, sEdge);
               speckleEdgeIndexes.Add(edge, edgeIndex);
               edgeIndex++;
@@ -943,7 +945,7 @@ namespace Objects.Converter.Revit
               // Update trim indices with new item.
               // TODO: Make this better.
               var trimIndices = sEdge.TrimIndices.ToList();
-              trimIndices.Append(sTrimIndex);
+              trimIndices.Add(sTrimIndex);
               sEdge.TrimIndices = trimIndices.ToArray();
             }
           }
@@ -956,9 +958,10 @@ namespace Objects.Converter.Revit
         }
 
         speckleFaces.Add(face,
-          new BrepFace(brep, surfaceIndex, loopIndices, loopIndices[0], !orientation));
+          new BrepFace(brep, surfaceIndex, loopIndices, loopIndices[0], orientation));
         faceIndex++;
         brep.Surfaces.Add(surface);
+  
         surfaceIndex++;
       }
 
@@ -981,6 +984,7 @@ namespace Objects.Converter.Revit
     public ISurface FaceToSpeckle(DB.Face face, out bool parametricOrientation, double relativeTolerance = 0.0, string units = null)
     {
       var u = units ?? ModelUnits;
+      parametricOrientation = true;
       using (var surface = face.GetSurface())
         parametricOrientation = surface.OrientationMatchesParametricOrientation;
       
@@ -1002,7 +1006,7 @@ namespace Objects.Converter.Revit
 
     public CylindricalSurface SurfaceToSpeckle(DB.CylindricalSurface surface, DB.BoundingBoxUV bboxUV)
     {
-      return SpeckleSurfaceFromCylinder(surface.Origin,surface.Axis,surface.XDir,surface.YDir, surface.Radius, null);
+      return SpeckleSurfaceFromCylinder(surface.Origin,surface.Axis,surface.XDir,surface.YDir, surface.Radius, bboxUV);
     }
     
     public PlanarSurface SpeckleSurfaceFromPlane(DB.XYZ origin, DB.XYZ xDir, DB.XYZ yDir, DB.XYZ zDir, DB.BoundingBoxUV bboxUV, double tolerance, string units = null)
@@ -1043,27 +1047,29 @@ namespace Objects.Converter.Revit
     {
       throw new NotImplementedException();
     }
-    public Surface FaceToSpeckle(RuledFace ruledFace, double tolerance, string units = null)
+    public RuledSurface FaceToSpeckle(RuledFace ruledFace, double tolerance, string units = null)
     {
-#if REVIT2021
-      var surf = DB.ExportUtils.GetNurbsSurfaceDataForSurface(ruledFace.GetSurface());
-#else
-      var surf = DB.ExportUtils.GetNurbsSurfaceDataForFace(ruledFace);
-#endif
-      var spcklSurface = NurbsSurfaceToSpeckle(surf, ruledFace.GetBoundingBox());
-      return spcklSurface;
-      /*var bboxUV = ruledFace.GetBoundingBox();
+      
+// #if REVIT2021
+//       var surf = DB.ExportUtils.GetNurbsSurfaceDataForSurface(ruledFace.GetSurface());
+// #else
+//       var surf = DB.ExportUtils.GetNurbsSurfaceDataForFace(ruledFace);
+// #endif
+//       var spcklSurface = NurbsSurfaceToSpeckle(surf, ruledFace.GetBoundingBox());
+//       return spcklSurface;
+      var u = units ?? ModelUnits;
+      var bboxUV = ruledFace.GetBoundingBox();
       var spcklSurf = new RuledSurface
       {
         isExtruded = ruledFace.IsExtruded,
-        curves = new List<ICurve> {CurveToSpeckle(ruledFace.get_Curve(0)), CurveToSpeckle(ruledFace.get_Curve(1))},
-        pointA = ruledFace.get_Curve(0) is null ? PointToSpeckle(ruledFace.get_Point(0)) : null,
-        pointB = ruledFace.get_Curve(1) is null ? PointToSpeckle(ruledFace.get_Point(1)) : null,
-        units = ModelUnits,
+        curves = new List<ICurve> {CurveToSpeckle(ruledFace.get_Curve(0), u), CurveToSpeckle(ruledFace.get_Curve(1), u)},
+        pointA = ruledFace.get_Curve(0) is null ? PointToSpeckle(ruledFace.get_Point(0), u) : null,
+        pointB = ruledFace.get_Curve(1) is null ? PointToSpeckle(ruledFace.get_Point(1), u) : null,
+        units = u,
         domainU = new Interval(bboxUV.Min.U, bboxUV.Max.U),
         domainV = new Interval(bboxUV.Min.V, bboxUV.Max.V)
       };
-      return spcklSurf;*/
+      return spcklSurf;
     }
 
     public int AddSurface(Brep brep, DB.Face face, out List<BrepBoundary>[] shells,
