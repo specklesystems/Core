@@ -625,7 +625,7 @@ namespace Objects.Converter.RhinoGh
       var Colors = mesh.VertexColors.Select(cl => cl.ToArgb()).ToArray();
 
       var speckleMesh = new Mesh(verts, Faces, Colors, null, u);
-      speckleMesh.volume = mesh.Volume();
+      speckleMesh.volume = mesh.IsClosed ? mesh.Volume() : 0;
       speckleMesh.bbox = BoxToSpeckle(new RH.Box(mesh.GetBoundingBox(true)), u);
       
       return speckleMesh;
@@ -802,7 +802,7 @@ namespace Objects.Converter.RhinoGh
           return t;
         })
         .ToList();
-      spcklBrep.volume = brep.GetVolume();
+      spcklBrep.volume = brep.IsSolid ? brep.GetVolume() : 0;
       spcklBrep.bbox = BoxToSpeckle(new RH.Box(brep.GetBoundingBox(true)), u);
       spcklBrep.area = brep.GetArea();
       return spcklBrep;
