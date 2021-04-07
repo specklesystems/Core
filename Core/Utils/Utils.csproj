@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>Speckle.Utils</AssemblyName>
+    <RootNamespace>Speckle.Utils</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Core\Core.csproj" />
+    <ProjectReference Include="..\Transports\ServerTransport\ServerTransport.csproj" />
+  </ItemGroup>
+
+</Project>

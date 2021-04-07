@@ -26,6 +26,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{A3E889EB
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiskTransport", "Transports\DiskTransport\DiskTransport.csproj", "{815A9C70-BF5F-4718-AACB-9E50B26F4630}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utils", "Utils\Utils.csproj", "{24301F14-0141-4543-8C63-A6CA507D0824}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -60,6 +62,10 @@ Global
 		{815A9C70-BF5F-4718-AACB-9E50B26F4630}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{815A9C70-BF5F-4718-AACB-9E50B26F4630}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{815A9C70-BF5F-4718-AACB-9E50B26F4630}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24301F14-0141-4543-8C63-A6CA507D0824}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24301F14-0141-4543-8C63-A6CA507D0824}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24301F14-0141-4543-8C63-A6CA507D0824}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24301F14-0141-4543-8C63-A6CA507D0824}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
