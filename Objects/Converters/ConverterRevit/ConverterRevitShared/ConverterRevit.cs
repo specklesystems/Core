@@ -34,6 +34,9 @@ namespace Objects.Converter.Revit
 
     public IEnumerable<string> GetServicedApplications() => new string[] { RevitAppName };
 
+    public IEnumerable<object> GetSupportedCategories() => Categories.SupportedBuiltInCategories.Cast<object>();
+
+
     #endregion ISpeckleConverter props
 
     public Document Doc { get; private set; }
@@ -442,5 +445,7 @@ namespace Objects.Converter.Revit
           return false;
       }
     }
+
+
   }
 }

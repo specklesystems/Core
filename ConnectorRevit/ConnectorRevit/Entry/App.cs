@@ -12,6 +12,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Speckle.ConnectorRevit.Storage;
 using Speckle.ConnectorRevit.UI;
+using Speckle.Core.Kits;
 using Speckle.DesktopUI;
 
 namespace Speckle.ConnectorRevit.Entry
@@ -30,7 +31,7 @@ namespace Speckle.ConnectorRevit.Entry
       UICtrlApp.Idling += Initialise;
 
       var SpecklePanel = application.CreateRibbonPanel("Speckle 2");
-      var SpeckleButton = SpecklePanel.AddItem(new PushButtonData("Speckle 2", "Revit Connector", typeof(App).Assembly.Location, typeof(SpeckleRevitCommand).FullName))as PushButton;
+      var SpeckleButton = SpecklePanel.AddItem(new PushButtonData("Speckle 2", "Revit Connector", typeof(App).Assembly.Location, typeof(SpeckleRevitCommand).FullName)) as PushButton;
 
       if (SpeckleButton != null)
       {
@@ -41,6 +42,14 @@ namespace Speckle.ConnectorRevit.Entry
         SpeckleButton.AvailabilityClassName = typeof(CmdAvailabilityViews).FullName;
         SpeckleButton.SetContextualHelp(new ContextualHelp(ContextualHelpType.Url, "https://speckle.systems"));
       }
+
+      //load kit and converter asnyc so that they get cached and will not slow down future loads
+      //this specifically helps when calling the GetSupportedCategories method
+      Task.Run(() =>
+      {
+        var kit = KitManager.GetDefaultKit();
+        var converter = kit.LoadConverter(ConnectorRevitUtils.RevitAppName);
+      });
 
       return Result.Succeeded;
     }

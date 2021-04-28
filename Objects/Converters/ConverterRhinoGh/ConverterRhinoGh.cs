@@ -42,6 +42,8 @@ namespace Objects.Converter.RhinoGh
 
     public IEnumerable<string> GetServicedApplications() => new string[] { Applications.Rhino, Applications.Grasshopper };
 
+    public IEnumerable<object> GetSupportedCategories() => new object[] { };
+
     public HashSet<Exception> ConversionErrors { get; private set; } = new HashSet<Exception>();
 
     public RhinoDoc Doc { get; private set; }
@@ -436,7 +438,7 @@ namespace Objects.Converter.RhinoGh
     {
       switch (@object)
       {
-        case Point _ :
+        case Point _:
           return true;
 
         case Pointcloud _:

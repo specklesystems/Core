@@ -41,7 +41,7 @@ namespace Objects.Converter.Revit
     //list of currently supported Categories (for sending only)
     //exact copy of the one in the Speckle.ConnectorRevit.ConnectorRevitUtils
     //until issue https://github.com/specklesystems/speckle-sharp/issues/392 is resolved
-    private static List<BuiltInCategory> SupportedBuiltInCategories = new List<BuiltInCategory>{
+    internal static List<BuiltInCategory> SupportedBuiltInCategories = new List<BuiltInCategory>{
 
       BuiltInCategory.OST_CableTray,
       BuiltInCategory.OST_Ceilings,

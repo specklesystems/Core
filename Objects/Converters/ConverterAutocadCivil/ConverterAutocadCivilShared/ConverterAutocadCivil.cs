@@ -50,6 +50,8 @@ namespace Objects.Converter.AutocadCivil
 
     public IEnumerable<string> GetServicedApplications() => new string[] { AutocadAppName };
 
+    public IEnumerable<object> GetSupportedCategories() => new object[] { };
+
     public HashSet<Exception> ConversionErrors { get; private set; } = new HashSet<Exception>();
 
     #endregion ISpeckleConverter props
@@ -219,8 +221,8 @@ namespace Objects.Converter.AutocadCivil
         case PlaneSurface o:
           return SurfaceToSpeckle(o);
 
-         case AcadDB.NurbSurface o:
-           return SurfaceToSpeckle(o);
+        case AcadDB.NurbSurface o:
+          return SurfaceToSpeckle(o);
 
         case AcadDB.PolyFaceMesh o:
           return MeshToSpeckle(o);

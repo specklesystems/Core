@@ -45,6 +45,8 @@ namespace Objects.Converter.Dynamo
 
     public IEnumerable<string> GetServicedApplications() => new string[] { AppName };
 
+    public IEnumerable<object> GetSupportedCategories() => new object[] { };
+
     public HashSet<Exception> ConversionErrors { get; private set; } = new HashSet<Exception>();
 
 #if REVIT
