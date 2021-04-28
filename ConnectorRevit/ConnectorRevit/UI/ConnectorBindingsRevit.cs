@@ -92,6 +92,16 @@ namespace Speckle.ConnectorRevit.UI
       if (e.Document == null || e.PreviousActiveView == null || GetDocHash(e.Document) == GetDocHash(e.PreviousActiveView.Document))
         return;
 
+      //quick hack to prevent users from using Speckle on Family documents, until we get proper support
+      if (SpeckleRevitCommand.Bootstrapper != null)
+      {
+        if (e.Document.IsFamilyDocument)
+          SpeckleRevitCommand.Bootstrapper.RootWindow.IsEnabled = false;
+        else
+          SpeckleRevitCommand.Bootstrapper.RootWindow.IsEnabled = true;
+      }
+  
+
       var appEvent = new ApplicationEvent()
       {
         Type = ApplicationEvent.EventType.ViewActivated,
@@ -108,8 +118,8 @@ namespace Speckle.ConnectorRevit.UI
       if (CurrentDoc != null)
         return;
 
-      if (SpeckleRevitCommand.Bootstrapper != null && SpeckleRevitCommand.Bootstrapper.Application!=null)
-        SpeckleRevitCommand.Bootstrapper.Application.MainWindow.Hide();
+      if (SpeckleRevitCommand.Bootstrapper != null)
+        SpeckleRevitCommand.Bootstrapper.RootWindow.Hide();
 
       var appEvent = new ApplicationEvent() { Type = ApplicationEvent.EventType.DocumentClosed };
       NotifyUi(appEvent);

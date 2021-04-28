@@ -14,7 +14,10 @@ namespace Speckle.ConnectorRevit
     /// <returns></returns>
     public bool IsCommandAvailable(UIApplication applicationData, CategorySet selectedCategories)
     {
-      //Can be run from any view/state
+      //Can be run only from project documents
+      if (applicationData.ActiveUIDocument == null || applicationData.ActiveUIDocument.Document.IsFamilyDocument)
+        return false;
+
       return true;
 
     }
