@@ -64,6 +64,12 @@ namespace Speckle.Core.Kits
     public IEnumerable<string> GetServicedApplications();
 
     /// <summary>
+    /// Returns a list of categories supported by this converter sot that they can be displayed in the UI filters and connector logic
+    /// </summary>
+    /// <returns></returns>
+    public IEnumerable<object> GetSupportedCategories();
+
+    /// <summary>
     /// Sets the application document that the converter is targeting
     /// </summary>
     /// <param name="doc">The current application document</param>
