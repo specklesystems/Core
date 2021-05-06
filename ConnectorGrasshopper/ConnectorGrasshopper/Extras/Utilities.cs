@@ -245,7 +245,28 @@ namespace ConnectorGrasshopper.Extras
       
       if (converter.CanConvertToSpeckle(value))
       {
-        return converter.ConvertToSpeckle(value);
+        var converted = converter.ConvertToSpeckle(value);
+        converted.GetDynamicMembers().ToList().ForEach(m =>
+        {
+          var member = converted[m];
+          if (member.GetType().IsSimpleType())
+          {
+            converted[m] = member;
+            return;
+          }
+
+          if (converter.CanConvertToSpeckle(member))
+          {
+            converted[m] = converter.ConvertToSpeckle(member);
+            return;
+          }
+
+          if (member is Base @basemember)
+          {
+            //TODO: Traverse and convert recursively.
+          }
+        });
+        return converted;
       }
       if (recursive && value is Base @base) 
         return TraverseAndConvertToSpeckle(@base, converter);
