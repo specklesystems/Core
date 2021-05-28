@@ -28,7 +28,7 @@ namespace Objects.Converter.Revit
       var docLevels = new FilteredElementCollector(Doc).OfClass(typeof(DB.Level)).ToElements().Cast<DB.Level>();
 
       // it's a level created with schema builder for reference only
-      // we only try to match it by name
+      // we only try to match it by name 
       var rl = speckleLevel as RevitLevel;
       if (rl != null && rl.referenceOnly)
       {

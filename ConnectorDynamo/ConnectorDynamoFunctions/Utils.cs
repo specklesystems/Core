@@ -120,7 +120,7 @@ namespace Speckle.ConnectorDynamo.Functions
       return null;
     }
 
-    internal static void HandleApiExeption(Exception ex)
+    internal static void HandleApiException(Exception ex)
     {
       if (ex.InnerException != null && ex.InnerException.InnerException != null)
       {

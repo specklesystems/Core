@@ -124,11 +124,11 @@ namespace Objects.Converter.Revit
         case DB.Mechanical.Duct o:
           returnObject = DuctToSpeckle(o);
           break;
-        case DB.Plumbing.Pipe o:
-          returnObject = PipeToSpeckle(o);
+        //case DB.Plumbing.Pipe o:
+          //returnObject = PipeToSpeckle(o);
           break;
-        case DB.Electrical.Wire o:
-          returnObject = WireToSpeckle(o);
+        //case DB.Electrical.Wire o:
+          //returnObject = WireToSpeckle(o);
           break;
         //these should be handled by curtain walls
         case DB.CurtainGridLine _:
@@ -279,11 +279,11 @@ namespace Objects.Converter.Revit
         case BE.Duct o:
           return DuctToNative(o);
 
-        case BE.Pipe o:
-          return PipeToNative(o);
+        //case BE.Pipe o:
+          //return PipeToNative(o);
 
-        case BE.Wire o:
-          return WireToNative(o);
+        //case BE.Wire o:
+          //return WireToNative(o);
 
         case BE.Revit.RevitRailing o:
           return RailingToNative(o);

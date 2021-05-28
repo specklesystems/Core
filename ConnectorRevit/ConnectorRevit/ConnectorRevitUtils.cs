@@ -201,6 +201,7 @@ namespace Speckle.ConnectorRevit
     //list of currently supported Categories
     private static List<BuiltInCategory> SupportedBuiltInCategories = new List<BuiltInCategory>{
 
+      BuiltInCategory.OST_Areas,
       BuiltInCategory.OST_CableTray,
       BuiltInCategory.OST_Ceilings,
       BuiltInCategory.OST_Columns,

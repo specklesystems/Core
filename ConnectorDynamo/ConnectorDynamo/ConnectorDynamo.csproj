@@ -100,110 +100,80 @@
     <None Include="pkg.json" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AccountsNode\Accounts.cs" />
-    <Compile Include="AccountsNode\AccountsUi.xaml.cs">
-      <DependentUpon>AccountsUi.xaml</DependentUpon>
+    <Compile Include="Accounts\SelectAccount.cs" />
+    <Compile Include="Accounts\SelectAccountUi.xaml.cs">
+      <DependentUpon>SelectAccountUi.xaml</DependentUpon>
     </Compile>
-    <Compile Include="AccountsNode\AccountsViewCustomization.cs" />
-    <Compile Include="CreateStreamNode\CreateStreamUi.xaml.cs">
+    <Compile Include="Accounts\SelectAccountViewCustomization.cs" />
+    <Compile Include="Accounts\AccountDetails.cs" />
+    <Compile Include="Developer\ConvertToNative.cs" />
+    <Compile Include="Developer\ConvertToSpeckle.cs" />
+    <Compile Include="Developer\LocalSendData.cs" />
+    <Compile Include="Developer\LocalReceiveData.cs" />
+    <Compile Include="Developer\JsonDeserialize.cs" />
+    <Compile Include="Developer\JsonSerialize.cs" />
+    <Compile Include="Developer\TransportDisk.cs" />
+    <Compile Include="Developer\TransportMemory.cs" />
+    <Compile Include="Developer\TransportServer.cs" />
+    <Compile Include="Developer\TransportSqLite.cs" />
+    <Compile Include="Streams\CreateStreamUi.xaml.cs">
       <DependentUpon>CreateStreamUi.xaml</DependentUpon>
     </Compile>
-    <Compile Include="CreateStreamNode\CreateStream.cs" />
-    <Compile Include="CreateStreamNode\CreateStreamViewCustomization.cs" />
+    <Compile Include="Streams\CreateStream.cs" />
+    <Compile Include="Streams\CreateStreamViewCustomization.cs" />
     <Compile Include="DebounceTimer.cs" />
-    <Compile Include="ReceiveNode\ReceiveUi.xaml.cs">
-      <DependentUpon>ReceiveUi.xaml</DependentUpon>
+    <Compile Include="Data\ReceiveDataUi.xaml.cs">
+      <DependentUpon>ReceiveDataUi.xaml</DependentUpon>
     </Compile>
-    <Compile Include="SendNode\SendViewCustomization.cs" />
-    <Compile Include="SendNode\Send.cs" />
-    <Compile Include="ReceiveNode\Receive.cs" />
+    <Compile Include="Data\SendDataViewCustomization.cs" />
+    <Compile Include="Data\SendData.cs" />
+    <Compile Include="Data\ReceiveData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ReceiveNode\ReceiveViewCustomization.cs" />
-    <Compile Include="SendNode\SendUi.xaml.cs">
-      <DependentUpon>SendUi.xaml</DependentUpon>
+    <Compile Include="Data\ReceiveDataViewCustomization.cs" />
+    <Compile Include="Data\SendDataUi.xaml.cs">
+      <DependentUpon>SendDataUi.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Streams\GetStream.cs" />
+    <Compile Include="Streams\ListStreams.cs" />
+    <Compile Include="Streams\StreamDetails.cs" />
+    <Compile Include="Streams\UpdateStream.cs" />
     <Compile Include="ValueConverters\BoolVisibConverter.cs" />
-    <Compile Include="ViewNode\View.cs" />
-    <Compile Include="ViewNode\ViewUi.xaml.cs">
-      <DependentUpon>SendUi.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ViewNode\ViewViewCustomization.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Assets\AccountDetails%40128.png" />
-    <Content Include="Assets\AccountDetails%4032.png" />
-    <Content Include="Assets\Accounts%40128.png" />
-    <Content Include="Assets\Accounts%4032.png" />
-    <Content Include="Assets\BaseParam%40128.png" />
-    <Content Include="Assets\BaseParam%4032.png" />
-    <Content Include="Assets\CreateSpeckleObject%40128.png" />
-    <Content Include="Assets\CreateSpeckleObject%4032.png" />
-    <Content Include="Assets\CreateSpeckleObjectByKeyValue%40128.png" />
-    <Content Include="Assets\CreateSpeckleObjectByKeyValue%4032.png" />
-    <Content Include="Assets\CreateStream%40128.png" />
-    <Resource Include="Assets\CreateStream%4032.png" />
-    <Content Include="Assets\Deserialize%40128.png" />
-    <Content Include="Assets\Deserialize%4032.png" />
-    <Content Include="Assets\DiskTransport%40128.png" />
-    <Content Include="Assets\DiskTransport%4032.png" />
-    <Content Include="Assets\ExpandSpeckleObject%40128.png" />
-    <Content Include="Assets\ExpandSpeckleObject%4032.png" />
-    <Content Include="Assets\ExtendSpeckleObject%40128.png" />
-    <Content Include="Assets\ExtendSpeckleObject%4032.png" />
-    <Content Include="Assets\GetObjectValueByKey%40128.png" />
-    <Content Include="Assets\GetObjectValueByKey%4032.png" />
-    <Content Include="Assets\LocalReceiver%40128.png" />
-    <Content Include="Assets\LocalReceiver%4032.png" />
-    <Content Include="Assets\LocalSender%40128.png" />
-    <Content Include="Assets\LocalSender%4032.png" />
     <Content Include="Assets\logo.png" />
     <Content Include="Assets\logo128.png" />
-    <Content Include="Assets\logo16.png" />
+    <None Include="Assets\logo12811.png" />
+    <None Include="Assets\logo12812.png" />
+    <None Include="Assets\logo128111.png" />
+    <None Include="Assets\logo1281111.png" />
+    <None Include="Assets\logo1281112.png" />
+    <None Include="Assets\logo12811121.png" />
+    <None Include="Assets\logo128111211.png" />
     <Content Include="Assets\logo32.png" />
-    <Content Include="Assets\MemoryTransport%40128.png" />
-    <Content Include="Assets\MemoryTransport%4032.png" />
-    <Content Include="Assets\Receiver%40128.png" />
-    <Resource Include="Assets\Receiver%4032.png" />
-    <Content Include="Assets\SchemaBuilder%40128.png" />
-    <Content Include="Assets\SchemaBuilder%4032.png" />
-    <Content Include="Assets\Sender%40128.png" />
-    <Resource Include="Assets\Sender%4032.png" />
-    <Content Include="Assets\Serialize%40128.png" />
-    <Content Include="Assets\Serialize%4032.png" />
-    <Content Include="Assets\ServerTransport%40128.png" />
-    <Content Include="Assets\ServerTransport%4032.png" />
-    <Content Include="Assets\SQLiteTransport%40128.png" />
-    <Content Include="Assets\SQLiteTransport%4032.png" />
-    <Content Include="Assets\StreamDetails%40128.png" />
-    <Content Include="Assets\StreamDetails%4032.png" />
-    <Content Include="Assets\StreamGet%40128.png" />
-    <Content Include="Assets\StreamGet%4032.png" />
-    <Content Include="Assets\StreamList%40128.png" />
-    <Content Include="Assets\StreamList%4032.png" />
-    <Content Include="Assets\StreamParam%40128.png" />
-    <Content Include="Assets\StreamParam%4032.png" />
-    <Content Include="Assets\StreamUpdate%40128.png" />
-    <Content Include="Assets\StreamUpdate%4032.png" />
-    <Content Include="Assets\StreamView%40128.png" />
-    <Resource Include="Assets\StreamView%4032.png" />
-    <Content Include="Assets\ToNative%40128.png" />
-    <Content Include="Assets\ToNative%4032.png" />
-    <Content Include="Assets\ToSpeckle%40128.png" />
-    <Content Include="Assets\ToSpeckle%4032.png" />
+    <None Include="Assets\logo3211.png" />
+    <None Include="Assets\logo3212.png" />
+    <None Include="Assets\logo32111.png" />
+    <None Include="Assets\logo321111.png" />
+    <None Include="Assets\logo321112.png" />
+    <None Include="Assets\logo3211121.png" />
+    <None Include="Assets\logo32111211.png" />
+    <None Include="Assets\logo321112111.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="SpeckleConnectorDynamoImages.resx" />
+    <EmbeddedResource Include="SpeckleConnectorDynamoImages.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="AccountsNode\AccountsUi.xaml">
+    <Page Include="Accounts\SelectAccountUi.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="CreateStreamNode\CreateStreamUi.xaml">
+    <Page Include="Streams\CreateStreamUi.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ReceiveNode\ReceiveUi.xaml">
+    <Page Include="Data\ReceiveDataUi.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -211,15 +181,12 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="SendNode\SendUi.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="ViewNode\ViewUi.xaml">
+    <Page Include="Data\SendDataUi.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -20,18 +20,14 @@ namespace Speckle.ConnectorDynamo.Functions
       return acc;
     }
 
-    /// <summary>
-    /// Get an Account details
-    /// </summary>
-    [NodeCategory("Query")]
-    [MultiReturn(new[] {"isDefault", "serverInfo", "userInfo"})]
-    public static Dictionary<string, object> Details(Core.Credentials.Account account)
+    [IsVisibleInDynamoLibrary(false)]
+    public static object Details(Core.Credentials.Account account)
     {
       Tracker.TrackPageview(Tracker.ACCOUNT_DETAILS);
       if(account == null)
       {
         
-        Utils.HandleApiExeption(new WarningException("Provided account was invalid."));
+        Utils.HandleApiException(new WarningException("Provided account was invalid."));
       }
       return new Dictionary<string, object>
       {

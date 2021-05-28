@@ -16,25 +16,19 @@ namespace Speckle.ConnectorDynamo.Functions
 {
   public static class Stream
   {
-    /// <summary>
-    /// Get an existing Stream
-    /// </summary>
-    /// <param name="stream">Stream to get with the specified account</param>
-    /// <param name="account">Optional Speckle account to get the Stream with</param>
-    /// <returns name="stream">A Stream</returns>
-    [NodeCategory("Create")]
-    public static object Get([ArbitraryDimensionArrayImport] object stream, [DefaultArgument("null")] Core.Credentials.Account account)
+    [IsVisibleInDynamoLibrary(false)]
+    public static object GetStream([ArbitraryDimensionArrayImport] object streamUrl, [DefaultArgument("null")] Core.Credentials.Account account)
     {
       Tracker.TrackPageview(Tracker.STREAM_GET);
 
-      var streams = Utils.InputToStream(stream);
+      var streams = Utils.InputToStream(streamUrl);
       if (!streams.Any())
       {
-        throw new SpeckleException("Please provide one or more Stream Ids.");
+        throw new SpeckleException("Please provide one or more Stream URLs.");
       }
       else if (streams.Count > 20)
       {
-        throw new SpeckleException("Please provide less than 20 Stream Ids.");
+        throw new SpeckleException("Please provide fewer than 20 Stream URLs.");
       }
 
       try
@@ -58,7 +52,7 @@ namespace Speckle.ConnectorDynamo.Functions
       }
       catch (Exception ex)
       {
-        Utils.HandleApiExeption(ex);
+        Utils.HandleApiException(ex);
       }
 
       if (streams.Count() == 1)
@@ -67,24 +61,17 @@ namespace Speckle.ConnectorDynamo.Functions
       return streams;
     }
 
-    /// <summary>
-    /// Update a Stream details, use is limited to 1 stream at a time
-    /// </summary>
-    /// <param name="stream">Stream object to update</param>
-    /// <param name="name">Name of the Stream</param>
-    /// <param name="description">Description of the Stream</param>
-    /// <param name="isPublic">True if the stream is to be publicly available</param>
-    /// <returns name="stream">Updated Stream object</returns>
-    public static StreamWrapper Update([DefaultArgument("null")] object stream, [DefaultArgument("null")] string name, [DefaultArgument("null")] string description, [DefaultArgument("null")] bool? isPublic)
+    [IsVisibleInDynamoLibrary(false)]
+    public static StreamWrapper UpdateStream(object streamUrl, [DefaultArgument("null")] string name, [DefaultArgument("null")] string description, [DefaultArgument("null")] bool? isPublic)
     {
       Tracker.TrackPageview(Tracker.STREAM_UPDATE);
 
-      if (stream == null)
+      if (streamUrl == null)
       {
         return null;
       }
 
-      var wrapper = Utils.ParseWrapper(stream);
+      var wrapper = Utils.ParseWrapper(streamUrl);
 
       if (wrapper == null)
       {
@@ -118,7 +105,7 @@ namespace Speckle.ConnectorDynamo.Functions
       }
       catch (Exception ex)
       {
-        Utils.HandleApiExeption(ex);
+        Utils.HandleApiException(ex);
       }
 
       return null;
@@ -128,18 +115,7 @@ namespace Speckle.ConnectorDynamo.Functions
     /// Extracts the details of a given stream, use is limited to max 20 streams 
     /// </summary>
     /// <param name="stream">Stream object</param>
-    [NodeCategory("Query")]
-    [MultiReturn(new[]
-    {
-      "id",
-      "name",
-      "description",
-      "createdAt",
-      "updatedAt",
-      "isPublic",
-      "collaborators",
-      "branches"
-    })]
+    [IsVisibleInDynamoLibrary(false)]
     public static object Details([ArbitraryDimensionArrayImport] object stream)
     {
       Tracker.TrackPageview(Tracker.STREAM_DETAILS);
@@ -150,7 +126,7 @@ namespace Speckle.ConnectorDynamo.Functions
         throw new SpeckleException("Please provide one or more Streams.");
 
       if (streams.Count > 20)
-        throw new SpeckleException("Please provide less than 20 Streams.");
+        throw new SpeckleException("Please provide fewer than 20 Streams.");
 
       var details = new List<Dictionary<string, object>>();
 
@@ -165,7 +141,8 @@ namespace Speckle.ConnectorDynamo.Functions
           Core.Api.Stream res = Task.Run(async () => await client.StreamGet(streamWrapper.StreamId)).Result;
 
           details.Add(new Dictionary<string, object>
-          { { "id", res.id },
+          {
+            { "id", res.id },
             { "name", res.name },
             { "description", res.description },
             { "createdAt", res.createdAt },
@@ -177,24 +154,17 @@ namespace Speckle.ConnectorDynamo.Functions
         }
         catch (Exception ex)
         {
-          Utils.HandleApiExeption(ex);
+          Utils.HandleApiException(ex);
           return details;
         }
 
       }
 
-      if (details.Count() == 1)
-        return details[0];
-
+      if (details.Count() == 1) return details[0];
       return details;
     }
 
-    /// <summary>
-    /// List all your Streams
-    /// </summary>
-    /// <param name="account">Speckle account to use, if not provided the default account will be used</param>
-    /// <param name="limit">Max number of streams to get</param>
-    /// <returns name="streams">Your Streams</returns>
+    [IsVisibleInDynamoLibrary(false)]
     [NodeCategory("Query")]
     public static List<StreamWrapper> List([DefaultArgument("null")] Core.Credentials.Account account = null, [DefaultArgument("10")] int limit = 10)
     {
@@ -205,7 +175,7 @@ namespace Speckle.ConnectorDynamo.Functions
 
       if (account == null)
       {
-        Utils.HandleApiExeption(new Exception("No accounts found. Please use the Speckle Manager to manage your accounts on this computer."));
+        Utils.HandleApiException(new Exception("No accounts found. Please use the Speckle Manager to manage your accounts on this computer."));
       }
 
       var client = new Client(account);
@@ -218,7 +188,7 @@ namespace Speckle.ConnectorDynamo.Functions
       }
       catch (Exception ex)
       {
-        Utils.HandleApiExeption(ex);
+        Utils.HandleApiException(ex);
       }
 
       return streamWrappers;

@@ -72,7 +72,7 @@ namespace Speckle.ConnectorDynamo.Functions
         }
         catch (Exception ex)
         {
-          Utils.HandleApiExeption(ex);
+          Utils.HandleApiException(ex);
           return null;
         }
 
@@ -115,7 +115,7 @@ namespace Speckle.ConnectorDynamo.Functions
         }
         catch (Exception ex)
         {
-          Utils.HandleApiExeption(ex);
+          Utils.HandleApiException(ex);
           return null;
         }
 
@@ -140,7 +140,7 @@ namespace Speckle.ConnectorDynamo.Functions
         }
         catch (Exception ex)
         {
-          Utils.HandleApiExeption(ex);
+          Utils.HandleApiException(ex);
           return null;
         }
       }

@@ -64,9 +64,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Advanced\Conversion.cs" />
-    <Compile Include="Advanced\Local.cs" />
-    <Compile Include="Advanced\Serialization.cs" />
     <Compile Include="Globals.cs" />
     <Compile Include="InMemoryCache.cs" />
     <Compile Include="Account.cs" />
@@ -100,12 +97,6 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="SpeckleConnectorDynamoFunctionsImages.resx" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\accountdetails%40128.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\accountdetails%4032.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="Clean">

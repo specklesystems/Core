@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Linq;
+using Autodesk.DesignScript.Runtime;
 using Dynamo.Graph.Nodes;
 using Speckle.Core.Credentials;
 using Speckle.Core.Logging;
@@ -16,6 +17,7 @@ namespace Speckle.ConnectorDynamo.Functions.Advanced
     /// <param name="basePath">The root folder where you want the data to be stored. Defaults to `%appdata%/Speckle/DiskTransportFiles`.</param>
     /// <returns name="transport">The Disk Transport you have created.</returns>
     [NodeCategory("Transports")]
+    [IsVisibleInDynamoLibrary(false)]
     public static object DiskTransport(string basePath = "")
     {
       if (string.IsNullOrEmpty(basePath))
@@ -31,6 +33,7 @@ namespace Speckle.ConnectorDynamo.Functions.Advanced
     /// <param name="name">The name of this Memory Transport.</param>
     /// <returns name="transport">The Memory Transport you have created.</returns>
     [NodeCategory("Transports")]
+    [IsVisibleInDynamoLibrary(false)]
     public static object MemoryTransport(string name = "Memory")
     {
       Tracker.TrackPageview("transports", "memory");
@@ -43,6 +46,7 @@ namespace Speckle.ConnectorDynamo.Functions.Advanced
     /// <param name="stream">The Stream you want to send data to.</param>
     /// <returns name="transport">The Server Transport you have created.</returns>
     [NodeCategory("Transports")]
+    [IsVisibleInDynamoLibrary(false)]
     public static object ServerTransport(StreamWrapper stream)
     {
       Tracker.TrackPageview("transports", "server");
@@ -78,6 +82,7 @@ namespace Speckle.ConnectorDynamo.Functions.Advanced
     /// <param name="scope">The name of the actual database file. Defaults to `UserLocalDefaultDb`.</param>
     /// <returns></returns>
     [NodeCategory("Transports")]
+    [IsVisibleInDynamoLibrary(false)]
     public static object SQLiteTransport(string basePath = "", string applicationName = "Speckle", string scope = "UserLocalDefaultDb")
     {
       if (string.IsNullOrEmpty(basePath))
