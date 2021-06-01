@@ -28,18 +28,18 @@ namespace ConnectorGrasshopper.Conversion
     public override GH_Exposure Exposure => GH_Exposure.primary;
 
 
-    public ToSpeckleConverterAsync() : base("Convert To Speckle", "To Speckle", "Convert data from Rhino to their Speckle Base equivalent.", ComponentCategories.SECONDARY_RIBBON, ComponentCategories.CONVERSION)
+    public ToSpeckleConverterAsync() : base("Convert To Speckle", "To Speckle", "Converts an object from its native representation to Speckle's object model.", ComponentCategories.SECONDARY_RIBBON, ComponentCategories.CONVERSION)
     {
     }
     
     protected override void RegisterInputParams(GH_InputParamManager pManager)
     {
-      pManager.AddGenericParameter("Data", "D", "Data to convert to Speckle Base objects.", GH_ParamAccess.tree);
+      pManager.AddGenericParameter("Data", "D", "An object from the application's object model.", GH_ParamAccess.tree);
     }
 
     protected override void RegisterOutputParams(GH_OutputParamManager pManager)
     {
-      pManager.AddGenericParameter("Base", "B", "Converted Base Speckle objects.", GH_ParamAccess.item);
+      pManager.AddGenericParameter("Base", "B", "The given object in Speckle's object model.", GH_ParamAccess.item);
       //pManager.AddParameter(new SpeckleBaseParam("Base", "B", "Converted Base Speckle objects.", GH_ParamAccess.item));
     }
 

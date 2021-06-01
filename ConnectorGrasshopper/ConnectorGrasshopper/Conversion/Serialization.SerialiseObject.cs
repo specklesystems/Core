@@ -32,7 +32,7 @@ namespace ConnectorGrasshopper.Conversion
 
     protected override void RegisterOutputParams(GH_OutputParamManager pManager)
     {
-      pManager.AddTextParameter("Json", "J", "Serialized objects in JSON format.", GH_ParamAccess.tree);
+      pManager.AddTextParameter("Json", "J", "The given object(s) serialized to JSON.", GH_ParamAccess.tree);
     }
 
     protected override void BeforeSolveInstance()

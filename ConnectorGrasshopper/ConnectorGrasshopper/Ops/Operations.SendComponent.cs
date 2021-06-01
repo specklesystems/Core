@@ -53,7 +53,7 @@ namespace ConnectorGrasshopper.Ops
 
     public ISpeckleKit Kit;
 
-    public SendComponent() : base("Send Data", "Send", "Sends data to a Speckle server (or any other provided transport).", ComponentCategories.PRIMARY_RIBBON,
+    public SendComponent() : base("Send Data", "Send", "Sends data to a Speckle stream, given its URL.", ComponentCategories.PRIMARY_RIBBON,
       ComponentCategories.SEND_RECEIVE)
     {
       Tracker.TrackPageview(Tracker.SEND_ADDED);

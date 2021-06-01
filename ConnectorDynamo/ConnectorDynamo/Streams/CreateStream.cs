@@ -20,7 +20,7 @@ namespace Speckle.ConnectorDynamo.Streams
   [NodeCategory("Speckle 2.Streams.Create")]
   [OutPortNames("streamUrl")]
   [OutPortDescriptions("URL of the newly-created Speckle stream.")]
-  [NodeDescription("Creates a new Speckle Stream.\n\nNote: This is a one-time operation. Once the button is pressed, this node becomes a stable reference to the new stream which will persist even when the .dyn file is closed and reopened.")]
+  [NodeDescription("Creates a new Speckle Stream.\n\nNote: This is a one-time operation. Once the button is pressed, this node becomes a stable reference to the new stream which will persist even when the file is closed and reopened.")]
   [NodeSearchTags("stream", "new", "create", "speckle")]
   [IsDesignScriptCompatible]
   public class CreateStream : NodeModel

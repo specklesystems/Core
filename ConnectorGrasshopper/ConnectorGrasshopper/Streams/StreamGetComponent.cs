@@ -14,7 +14,7 @@ namespace ConnectorGrasshopper.Streams
 {
   public class StreamGetComponent : GH_Component
   {
-    public StreamGetComponent() : base("Get Stream", "sGet", "Gets a specific stream from your account", ComponentCategories.PRIMARY_RIBBON,
+    public StreamGetComponent() : base("Get Stream", "sGet", "Gets an existing Stream from its URL. This component is used for gaining access to a stream via a specific Speckle account.", ComponentCategories.PRIMARY_RIBBON,
       ComponentCategories.STREAMS)
     { }
 
@@ -26,16 +26,16 @@ namespace ConnectorGrasshopper.Streams
 
     protected override void RegisterInputParams(GH_InputParamManager pManager)
     {
-      pManager.AddParameter(new SpeckleStreamParam("Stream ID/URL", "ID/URL", "Speckle stream ID or URL",
+      pManager.AddParameter(new SpeckleStreamParam("Stream ID/URL", "ID/URL", "URL of the Speckle stream(s) to retrieve details from. Can be the URL of a stream, branch or commit or object.",
         GH_ParamAccess.item));
-      var acc = pManager.AddTextParameter("Account", "A", "Account to get stream with.", GH_ParamAccess.item);
+      var acc = pManager.AddTextParameter("Account", "A", "A Speckle account. Use the Select Account component to retrieve Speckle accounts.", GH_ParamAccess.item);
 
       Params.Input[acc].Optional = true;
     }
 
     protected override void RegisterOutputParams(GH_OutputParamManager pManager)
     {
-      pManager.AddParameter(new SpeckleStreamParam("Stream", "S", "Speckle Stream",
+      pManager.AddParameter(new SpeckleStreamParam("Stream", "S", "The URL of one (or more) Speckle stream(s).",
         GH_ParamAccess.item));
     }
 

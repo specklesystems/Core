@@ -34,7 +34,7 @@ namespace ConnectorGrasshopper.Ops
 
     public ISpeckleKit Kit;
 
-    public ReceiveComponent() : base("Receive Data", "Receive", "Receive data from a Speckle server", ComponentCategories.PRIMARY_RIBBON,
+    public ReceiveComponent() : base("Receive Data", "Receive", "Receives data from a Speckle stream, given its URL.", ComponentCategories.PRIMARY_RIBBON,
       ComponentCategories.SEND_RECEIVE)
     {
       Tracker.TrackPageview(Tracker.RECEIVE_ADDED);

@@ -13,13 +13,13 @@ namespace Speckle.ConnectorDynamo.Developer
 {
   [NodeName("Deserialize from JSON")]
   [NodeCategory("Speckle 2.Developer Tools.Serialize.Actions")]
-  [NodeDescription("Deserializes an object from JSON.")]
+  [NodeDescription("Deserializes a JSON string to a Speckle Base object.")]
   [InPortNames("json")]
   [InPortTypes("string")]
-  [InPortDescriptions("A JSON representation of an object(s).")]
+  [InPortDescriptions("Serialized Base objects in JSON format.")]
   [OutPortNames("object")]
   [OutPortTypes("object")]
-  [OutPortDescriptions("The deserialized object")]
+  [OutPortDescriptions("Deserialized Speckle Base objects.")]
   [NodeSearchTags("speckle", "developer", "deserialize", "JSON")]
   [IsDesignScriptCompatible]
   public class JsonDeserialize : NodeModel

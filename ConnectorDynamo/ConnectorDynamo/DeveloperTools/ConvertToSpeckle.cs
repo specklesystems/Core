@@ -16,7 +16,7 @@ namespace Speckle.ConnectorDynamo.Developer
   [NodeName("Convert To Speckle")]
   [NodeCategory("Speckle 2.Developer Tools.Conversion.Actions")]
   [NodeDescription("Converts an object from its native representation to Speckle's object model.")]
-  [InPortDescriptions("An object deriving from Speckle's base object.")]
+  [InPortDescriptions("An object from the application's object model.")]
   [InPortNames("nativeObject")]
   [InPortTypes("object")]
   [OutPortNames("base")]

@@ -16,7 +16,7 @@ namespace ConnectorGrasshopper.Streams
 {
   public class StreamDetailsComponent : GH_Component
   {
-    public StreamDetailsComponent() : base("Stream Details", "sDet", "Extracts the details of a given stream, use is limited to 20 streams.",
+    public StreamDetailsComponent() : base("Stream Details", "sDet", "Extracts the details of a given stream, or list of streams. Use is limited to max 20 streams.",
       ComponentCategories.PRIMARY_RIBBON, ComponentCategories.STREAMS)
     {
     }
@@ -26,7 +26,7 @@ namespace ConnectorGrasshopper.Streams
     protected override void RegisterInputParams(GH_InputParamManager pManager)
     {
       pManager.AddParameter(new SpeckleStreamParam("Stream", "S",
-        "A stream object of the stream to be updated.", GH_ParamAccess.tree));
+        "URL of the Speckle stream(s) to retrieve details from. Can be the URL of a stream, branch or commit or object.", GH_ParamAccess.tree));
     }
 
     protected override Bitmap Icon => Properties.Resources.StreamDetails;

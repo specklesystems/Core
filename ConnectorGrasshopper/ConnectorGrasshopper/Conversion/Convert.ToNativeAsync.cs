@@ -28,19 +28,19 @@ namespace ConnectorGrasshopper.Conversion
     public override GH_Exposure Exposure => GH_Exposure.primary;
 
     public ToNativeConverterAsync() : base("Convert To Native", "To Native",
-      "Convert data from Speckle's Base object to its Rhino equivalent.", ComponentCategories.SECONDARY_RIBBON, ComponentCategories.CONVERSION)
+      "Converts an object from its Speckle representation to the native application's object model.", ComponentCategories.SECONDARY_RIBBON, ComponentCategories.CONVERSION)
     {
     }
     
     protected override void RegisterInputParams(GH_InputParamManager pManager)
     {
       pManager.AddGenericParameter("Base", "B",
-        "Speckle Base objects to convert to Grasshopper.", GH_ParamAccess.tree);
+        "An object deriving from Speckle's base object.", GH_ParamAccess.tree);
     }
 
     protected override void RegisterOutputParams(GH_OutputParamManager pManager)
     {
-      pManager.AddGenericParameter("Data", "D", "Converted data in GH native format.", GH_ParamAccess.tree);
+      pManager.AddGenericParameter("Data", "D", "The given object in the application's native object model.", GH_ParamAccess.tree);
     }
 
     protected override void BeforeSolveInstance()

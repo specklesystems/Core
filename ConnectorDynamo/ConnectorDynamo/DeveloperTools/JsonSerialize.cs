@@ -14,10 +14,10 @@ namespace Speckle.ConnectorDynamo.Developer
 {
   [NodeName("Serialize to JSON")]
   [NodeCategory("Speckle 2.Developer Tools.Serialize.Actions")]
-  [NodeDescription("Serializes an object to JSON.")]
+  [NodeDescription("Serializes a Speckle Base object to JSON")]
   [InPortNames("object")]
   [InPortTypes("object")]
-  [InPortDescriptions("An object to be serialized.")]
+  [InPortDescriptions("Speckle base objects to serialize.")]
   [OutPortNames("json")]
   [OutPortTypes("string")]
   [OutPortDescriptions("The given object(s) serialized to JSON.")]

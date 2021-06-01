@@ -14,7 +14,7 @@ namespace ConnectorGrasshopper.Streams
 {
   public class StreamListComponent : GH_Component
   {
-    public StreamListComponent() : base("List Streams", "sList", "Lists all the streams for this account", ComponentCategories.PRIMARY_RIBBON,
+    public StreamListComponent() : base("List Streams", "sList", "Lists all the streams associated to the given account. If no account is given, all streams belonging to the default Speckle Manager account are retrieved.", ComponentCategories.PRIMARY_RIBBON,
       ComponentCategories.STREAMS)
     { }
 
@@ -25,15 +25,15 @@ namespace ConnectorGrasshopper.Streams
 
     protected override void RegisterInputParams(GH_InputParamManager pManager)
     {
-      var acc = pManager.AddTextParameter("Account", "A", "Account to get streams from", GH_ParamAccess.item);
-      pManager.AddIntegerParameter("Limit", "L", "Max number of streams to fetch", GH_ParamAccess.item, 10);
+      var acc = pManager.AddTextParameter("Account", "A", "A Speckle account. Use the Select Account component to retrieve Speckle accounts.", GH_ParamAccess.item);
+      pManager.AddIntegerParameter("Limit", "L", "Optional: Limit the maximum number of streams to retrieve.", GH_ParamAccess.item, 10);
 
       Params.Input[acc].Optional = true;
     }
 
     protected override void RegisterOutputParams(GH_OutputParamManager pManager)
     {
-      pManager.AddParameter(new SpeckleStreamParam("Streams", "S", "List of streams for the provided account.",
+      pManager.AddParameter(new SpeckleStreamParam("Streams", "S", "The URL of one (or more) Speckle stream(s).",
         GH_ParamAccess.list));
     }
 

@@ -25,7 +25,7 @@ namespace ConnectorGrasshopper.Ops
 
     public ISpeckleKit Kit;
     public ReceiveLocalComponent() : base("Receive Local Data", "LR",
-      "Receives data locally, without the need of a Speckle Server. NOTE: updates will not be automatically received.",
+      "Receives data locally, without requiring a Speckle Server.\nNOTE: Updates will not be received automatically.",
       ComponentCategories.SECONDARY_RIBBON, ComponentCategories.LOCAL)
     {
       BaseWorker = new ReceiveLocalWorker(this);
@@ -37,12 +37,12 @@ namespace ConnectorGrasshopper.Ops
 
     protected override void RegisterInputParams(GH_InputParamManager pManager)
     {
-      pManager.AddGenericParameter("localDataId", "id", "ID of the local data sent.", GH_ParamAccess.item);
+      pManager.AddGenericParameter("localDataId", "id", "ID of the local data to receive.", GH_ParamAccess.item);
     }
 
     protected override void RegisterOutputParams(GH_OutputParamManager pManager)
     {
-      pManager.AddGenericParameter("Data", "D", "Data to send.", GH_ParamAccess.tree);
+      pManager.AddGenericParameter("Data", "D", "The received data.", GH_ParamAccess.tree);
     }
 
     protected override void AppendAdditionalComponentMenuItems(ToolStripDropDown menu)

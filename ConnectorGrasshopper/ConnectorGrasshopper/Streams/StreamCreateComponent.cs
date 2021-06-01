@@ -21,7 +21,7 @@ namespace ConnectorGrasshopper.Streams
 
     public StreamWrapper stream { get; set; } = null;
 
-    public StreamCreateComponent() : base("Create Stream", "sCreate", "Create a new speckle stream.", ComponentCategories.PRIMARY_RIBBON,
+    public StreamCreateComponent() : base("Create Stream", "sCreate", "Creates a new Speckle Stream.\n\nNote: This is a one-time operation. Once the button is pressed, this node becomes a stable reference to the new stream which will persist even when the file is closed and reopened.", ComponentCategories.PRIMARY_RIBBON,
       ComponentCategories.STREAMS)
     { }
 
@@ -32,7 +32,7 @@ namespace ConnectorGrasshopper.Streams
 
     protected override void RegisterOutputParams(GH_OutputParamManager pManager)
     {
-      pManager.AddParameter(new SpeckleStreamParam("Stream", "S", "The created stream.", GH_ParamAccess.item));
+      pManager.AddParameter(new SpeckleStreamParam("Stream", "S", "URL of the newly-created Speckle stream.", GH_ParamAccess.item));
     }
 
     public override bool Read(GH_IReader reader)

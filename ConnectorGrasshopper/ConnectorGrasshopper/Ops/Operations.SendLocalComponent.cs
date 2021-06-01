@@ -22,7 +22,7 @@ namespace ConnectorGrasshopper.Ops
     public ISpeckleConverter Converter;
 
     public ISpeckleKit Kit;
-    public SendLocalComponent() : base("Send Local Data", "LS", "Sends data locally, without the need of a Speckle Server.", ComponentCategories.SECONDARY_RIBBON, ComponentCategories.LOCAL)
+    public SendLocalComponent() : base("Send Local Data", "LS", "Sends data locally, without requiring a Speckle Server.", ComponentCategories.SECONDARY_RIBBON, ComponentCategories.LOCAL)
     {
       BaseWorker = new SendLocalWorker(this);
     }
@@ -39,12 +39,12 @@ namespace ConnectorGrasshopper.Ops
     
     protected override void RegisterInputParams(GH_InputParamManager pManager)
     {
-      pManager.AddGenericParameter("Data", "D", "Data to send.", GH_ParamAccess.tree);
+      pManager.AddGenericParameter("Data", "D", "The data to be sent locally.", GH_ParamAccess.tree);
     }
 
     protected override void RegisterOutputParams(GH_OutputParamManager pManager)
     {
-      pManager.AddGenericParameter("localDataId", "id", "ID of the local data sent.", GH_ParamAccess.item);
+      pManager.AddGenericParameter("localDataId", "id", "Id of the data that was sent locally.", GH_ParamAccess.item);
     }
 
     protected override void AppendAdditionalComponentMenuItems(ToolStripDropDown menu)
