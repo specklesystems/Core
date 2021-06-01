@@ -197,8 +197,6 @@ namespace Objects.Converter.AutocadCivil
       List<Point3d> vertices = new List<Point3d>();
       for (int i = 0; i < polyline.NumberOfVertices; i++)
         vertices.Add(polyline.GetPoint3dAt(i));
-      if (polyline.Closed)
-        vertices.Add(polyline.GetPoint3dAt(0));
 
       var _polyline = new Polyline(PointsToFlatArray(vertices), ModelUnits);
       _polyline.closed = polyline.Closed;
@@ -229,8 +227,6 @@ namespace Objects.Converter.AutocadCivil
           }
           tr.Commit();
         }
-        if (polyline.Closed)
-          vertices.Add(vertices[0]);
       }
 
       var _polyline = new Polyline(PointsToFlatArray(vertices), ModelUnits);
@@ -255,8 +251,29 @@ namespace Objects.Converter.AutocadCivil
       var segments = new List<ICurve>();
       var exploded = new DBObjectCollection();
       polyline.Explode(exploded);
+      Point3d previousPoint = new Point3d();
       for (int i = 0; i < exploded.Count; i++)
-        segments.Add((ICurve)ConvertToSpeckle(exploded[i]));
+      {
+        var segment = (exploded[i] as AcadDB.Curve).GetGeCurve();
+
+        if (i == 0 && exploded.Count > 1)
+        {
+          // get the connection point to the next segment - this is necessary since imported polycurves might have segments in different directions
+          var connectionPoint = new Point3d();
+          var nextSegment = (exploded[i+1] as AcadDB.Curve).GetGeCurve();
+          if (nextSegment.StartPoint.IsEqualTo(segment.StartPoint) || nextSegment.StartPoint.IsEqualTo(segment.EndPoint))
+            connectionPoint = nextSegment.StartPoint;
+          else
+            connectionPoint = nextSegment.EndPoint;
+          previousPoint = connectionPoint;
+          segment = GetCorrectSegmentDirection(segment, connectionPoint, true, out Point3d otherPoint);
+        }
+        else
+        {
+          segment = GetCorrectSegmentDirection(segment, previousPoint, false, out previousPoint);
+        }
+        segments.Add(CurveToSpeckle(segment));
+      }
       polycurve.segments = segments;
 
       polycurve.length = polyline.Length;
@@ -270,18 +287,29 @@ namespace Objects.Converter.AutocadCivil
 
       // extract segments
       var segments = new List<ICurve>();
+      Point3d previousPoint = new Point3d();
       for (int i = 0; i < polyline.NumberOfVertices; i++)
       {
-        SegmentType type = polyline.GetSegmentType(i);
-        switch (type)
+        var segment = GetSegmentByType(polyline, i);
+        if (segment == null)
+          continue;
+        if (i == 0 && polyline.NumberOfVertices > 1)
         {
-          case SegmentType.Line:
-            segments.Add(LineToSpeckle(polyline.GetLineSegmentAt(i)));
-            break;
-          case SegmentType.Arc:
-            segments.Add(ArcToSpeckle(polyline.GetArcSegmentAt(i)));
-            break;
+          // get the connection point to the next segment
+          var connectionPoint = new Point3d();
+          var nextSegment = GetSegmentByType(polyline, i + 1);
+          if (nextSegment.StartPoint.IsEqualTo(segment.StartPoint) || nextSegment.StartPoint.IsEqualTo(segment.EndPoint))
+            connectionPoint = nextSegment.StartPoint;
+          else
+            connectionPoint = nextSegment.EndPoint;
+          previousPoint = connectionPoint;
+          segment = GetCorrectSegmentDirection(segment, connectionPoint, true, out Point3d otherPoint);
         }
+        else
+        {
+          segment = GetCorrectSegmentDirection(segment, previousPoint, false, out previousPoint);
+        }
+        segments.Add(CurveToSpeckle(segment));
       }
       polycurve.segments = segments;
 
@@ -289,6 +317,42 @@ namespace Objects.Converter.AutocadCivil
       polycurve.bbox = BoxToSpeckle(polyline.GeometricExtents, true);
 
       return polycurve;
+    }
+
+    private Curve3d GetSegmentByType(AcadDB.Polyline polyline, int i)
+    {
+      SegmentType type = polyline.GetSegmentType(i);
+      switch (type)
+      {
+        case SegmentType.Line:
+          return polyline.GetLineSegmentAt(i);
+        case SegmentType.Arc:
+          return polyline.GetArcSegmentAt(i);
+        default:
+          return null;
+      }
+    }
+
+    private Curve3d GetCorrectSegmentDirection (Curve3d segment, Point3d connectionPoint, bool isFirstSegment, out Point3d nextPoint) // note sometimes curve3d may not have endpoints
+    {
+      nextPoint = segment.EndPoint;
+
+      if (connectionPoint == null)
+        return segment;
+
+      bool reverseDirection = false; 
+      if (isFirstSegment)
+      {
+        reverseDirection = (segment.StartPoint.IsEqualTo(connectionPoint)) ? true : false;
+        if (reverseDirection) nextPoint = segment.StartPoint;
+      }  
+      else
+      {
+        reverseDirection = (segment.StartPoint.IsEqualTo(connectionPoint)) ? false : true;
+        if (reverseDirection) nextPoint = segment.StartPoint;
+      }
+        
+      return (reverseDirection) ? segment.GetReverseParameterCurve() : segment;
     }
 
     // polylines can only support curve segments of type circular arc
@@ -489,15 +553,27 @@ namespace Objects.Converter.AutocadCivil
       }
     }
 
-    // Surfaces
-    public Surface SurfaceToSpeckle(AcadDB.PlaneSurface surface, string units = null)
+    // Regions
+    public Mesh RegionToSpeckle(Region region, string units = null)
     {
       var u = units ?? ModelUnits;
 
-      var nurbs = surface.ConvertToNurbSurface();
-      if (nurbs.Length > 0)
-        return SurfaceToSpeckle(nurbs[0], u);
-      return null;
+      return GetMeshFromSolidOrSurface(region: region);
+    }
+
+    // Surfaces
+    public Mesh SurfaceToSpeckle(AcadDB.Surface surface, string units = null)
+    {
+      var u = units ?? ModelUnits;
+
+      switch (surface)
+      {
+        case AcadDB.PlaneSurface _:
+        case AcadDB.NurbSurface _:
+        default: // return mesh for now
+          var displayMesh = GetMeshFromSolidOrSurface(surface: surface);
+          return displayMesh;
+      }
     }
 
     public Surface SurfaceToSpeckle(AcadDB.NurbSurface surface, string units = null)
@@ -592,8 +668,8 @@ namespace Objects.Converter.AutocadCivil
       return speckleMesh;
     }
     */
-    // Polyface mesh vertex indexing starts at 1. Subtract 1 from face vertex index when sending to Speckle
-    public Mesh MeshToSpeckle(AcadDB.PolyFaceMesh mesh, string units = null)
+      // Polyface mesh vertex indexing starts at 1. Subtract 1 from face vertex index when sending to Speckle
+      public Mesh MeshToSpeckle(AcadDB.PolyFaceMesh mesh, string units = null)
     {
       var u = units ?? ModelUnits;
 
@@ -674,12 +750,17 @@ namespace Objects.Converter.AutocadCivil
     public AcadDB.PolyFaceMesh MeshToNativeDB(Mesh mesh)
     {
       // get vertex points
+      var vertices = new Point3dCollection();
       Point3d[] points = PointListToNative(mesh.vertices, mesh.units);
+      foreach (var point in points)
+        vertices.Add(point);
 
       PolyFaceMesh _mesh = null;
+
       using (Transaction tr = Doc.TransactionManager.StartTransaction())
       {
         _mesh = new PolyFaceMesh();
+        _mesh.SetDatabaseDefaults();
 
         // append mesh to blocktable record - necessary before adding vertices and faces
         BlockTableRecord btr = (BlockTableRecord)tr.GetObject(Doc.Database.CurrentSpaceId, OpenMode.ForWrite);
@@ -687,7 +768,8 @@ namespace Objects.Converter.AutocadCivil
         tr.AddNewlyCreatedDBObject(_mesh, true);
 
         // add polyfacemesh vertices
-        for (int i = 0; i < points.Length; i++)
+        
+        for (int i = 0; i < vertices.Count; i++)
         {
           var vertex = new PolyFaceMeshVertex(points[i]);
           try
@@ -698,6 +780,7 @@ namespace Objects.Converter.AutocadCivil
           catch { }
           _mesh.AppendVertex(vertex);
           tr.AddNewlyCreatedDBObject(vertex, true);
+          vertex.Dispose();
         }
 
         // add polyfacemesh faces. vertex index starts at 1 sigh
@@ -720,10 +803,12 @@ namespace Objects.Converter.AutocadCivil
             _mesh.AppendFaceRecord(face);
             tr.AddNewlyCreatedDBObject(face, true);
           }
+          face.Dispose();
         }
 
         tr.Commit();
       }
+      
       
       return _mesh;
     }
@@ -734,7 +819,7 @@ namespace Objects.Converter.AutocadCivil
       var u = units ?? ModelUnits;
 
       // create display mesh
-      var displayMesh = GetMeshFromSolid(solid);
+      var displayMesh = GetMeshFromSolidOrSurface(solid);
 
       return displayMesh;
 
@@ -826,11 +911,19 @@ namespace Objects.Converter.AutocadCivil
     }
 
     // Based on Kean Walmsley's blog post on mesh conversion using Brep API
-    private Mesh GetMeshFromSolid(Solid3d solid)
+    private Mesh GetMeshFromSolidOrSurface(Solid3d solid = null, AcadDB.Surface surface = null, Region region = null)
     {
       Mesh mesh = null;
 
-      using (var brep = new AcadBRep.Brep(solid))
+      AcadBRep.Brep brep = null;
+      if (solid != null)
+        brep = new AcadBRep.Brep(solid);
+      else if (surface != null)
+        brep = new AcadBRep.Brep(surface);
+      else if (region != null)
+        brep = new AcadBRep.Brep(region);
+
+      if (brep!= null)
       {
         using (var control = new AcadBRep.Mesh2dControl())
         {
@@ -874,18 +967,25 @@ namespace Objects.Converter.AutocadCivil
               }
             }
           }
+          brep.Dispose();
 
           // create speckle mesh
           var vertices = PointsToFlatArray(_vertices);
           var faces = _faces.SelectMany(o => o).ToArray();
           mesh = new Mesh(vertices, faces);
           mesh.units = ModelUnits;
-          mesh.bbox = BoxToSpeckle(solid.GeometricExtents);
+          if (solid != null)
+            mesh.bbox = BoxToSpeckle(solid.GeometricExtents);
+          else if (surface != null)
+            mesh.bbox = BoxToSpeckle(surface.GeometricExtents);
+          else if (region != null)
+            mesh.bbox = BoxToSpeckle(region.GeometricExtents);
         }
       }
 
       return mesh;
     }
+
 
     private int GetIndexOfCurve(List<Curve3d> list, Curve3d curve) // necessary since contains comparer doesn't work
     {
@@ -930,6 +1030,10 @@ namespace Objects.Converter.AutocadCivil
 
     public BlockInstance BlockReferenceToSpeckle(AcadDB.BlockReference reference)
     {
+      // skip if dynamic block
+      if (reference.IsDynamicBlock)
+        return null;
+
       // get record
       BlockDefinition definition = null;
       using (Transaction tr = Doc.TransactionManager.StartTransaction())
@@ -949,9 +1053,10 @@ namespace Objects.Converter.AutocadCivil
 
       return instance;
     }
-    public string BlockInstanceToNativeDB( BlockInstance instance)
+    public string BlockInstanceToNativeDB(BlockInstance instance, out BlockReference reference, bool AppendToModelSpace = true)
     {
       string result = null;
+      reference = null;
 
       // block definition
       ObjectId definitionId = BlockDefinitionToNativeDB(instance.blockDefinition);
@@ -975,9 +1080,14 @@ namespace Objects.Converter.AutocadCivil
 
         BlockReference br = new BlockReference(insertionPoint, definitionId);
         br.BlockTransform = convertedTransform;
-        modelSpaceRecord.AppendEntity(br);
-        tr.AddNewlyCreatedDBObject(br, true);
+        if (AppendToModelSpace)
+        {
+          modelSpaceRecord.AppendEntity(br);
+          tr.AddNewlyCreatedDBObject(br, true);
+        }
+        
         result = "success";
+        reference = br;
 
         tr.Commit();
       }
@@ -1029,14 +1139,10 @@ namespace Objects.Converter.AutocadCivil
       {
         // see if block record already exists and return if so
         BlockTable blckTbl = tr.GetObject(Doc.Database.BlockTableId, OpenMode.ForRead) as BlockTable;
-        foreach (ObjectId id in blckTbl)
+        if (blckTbl.Has(blockName))
         {
-          BlockTableRecord btr = (BlockTableRecord)tr.GetObject(id, OpenMode.ForRead);
-          if (btr.Name == blockName)
-          {
-            tr.Commit();
-            return id;
-          }
+          tr.Commit();
+          return blckTbl[blockName];
         }
 
         // create btr
@@ -1053,7 +1159,18 @@ namespace Objects.Converter.AutocadCivil
           {
             if (CanConvertToNative(geo))
             {
-              var converted = ConvertToNative(geo) as Entity;
+              Entity converted = null;
+              switch (geo)
+              {
+                case BlockInstance o:
+                  BlockInstanceToNativeDB(o, out BlockReference reference, false);
+                  converted = reference;
+                  break;
+                default:
+                  converted = ConvertToNative(geo) as Entity;
+                  break;
+              }
+              
               if (converted == null)
                 continue;
               btr.AppendEntity(converted);
@@ -1061,6 +1178,7 @@ namespace Objects.Converter.AutocadCivil
           }
           blockId = blckTbl.Add(btr);
           tr.AddNewlyCreatedDBObject(btr, true);
+          blckTbl.Dispose();
         }
         tr.Commit();
       }

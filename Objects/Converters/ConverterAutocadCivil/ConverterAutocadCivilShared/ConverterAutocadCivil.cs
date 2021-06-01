@@ -157,17 +157,22 @@ public static string AutocadAppName = Applications.Autocad2022;
         case Curve o:
           return CurveToNativeDB(o);
 
-        //case Surface o: // TODO: NOT TESTED
+          /*
+        //case Surface o: 
         //  return SurfaceToNative(o);
 
-        //case Brep o: // TODO: NOT TESTED
-        //  return BrepToNativeDB(o);
+        case Brep o:
+          if (o.displayMesh != null)
+            return MeshToNativeDB(o.displayMesh);
+          else
+            return null;
 
         //case Mesh o: // unstable, do not use for now
         //  return MeshToNativeDB(o);
+        */
 
         case BlockInstance o:
-          return BlockInstanceToNativeDB(o);
+          return BlockInstanceToNativeDB(o, out BlockReference refernce);
 
         case BlockDefinition o:
           return BlockDefinitionToNativeDB(o);
@@ -220,11 +225,11 @@ public static string AutocadAppName = Applications.Autocad2022;
         case AcadDB.Polyline2d o:
           return PolycurveToSpeckle(o);
 
-        case PlaneSurface o:
-          return SurfaceToSpeckle(o);
+        case Region o:
+          return RegionToSpeckle(o);
 
-         case AcadDB.NurbSurface o:
-           return SurfaceToSpeckle(o);
+        case AcadDB.Surface o:
+          return SurfaceToSpeckle(o);
 
         case AcadDB.PolyFaceMesh o:
           return MeshToSpeckle(o);
@@ -282,9 +287,9 @@ public static string AutocadAppName = Applications.Autocad2022;
             case AcadDB.Polyline _:
             case AcadDB.Polyline2d _:
             case AcadDB.Polyline3d _:
-            case AcadDB.PlaneSurface _:
-            case AcadDB.NurbSurface _:
+            case AcadDB.Surface _:
             case AcadDB.PolyFaceMesh _:
+            case AcadDB.Region _:
             case SubDMesh _:
             case Solid3d _:
               return true;
@@ -326,41 +331,17 @@ public static string AutocadAppName = Applications.Autocad2022;
       switch (@object)
       {
         case Point _:
-          return true;
-
         case Line _:
-          return true;
-
         case Arc _:
-          return true;
-
-        case Circle _:
-          return true;
-
+        case Circle _:  
         case Ellipse _:
-          return true;
-
         case Polyline _:
-          return true;
-
         case Polycurve _:
-          return true;
-
         case Curve _:
-          return true;
-
-        case Surface _:
-          return false;
-
-        case Brep _:
-          return false;
-
-        case Mesh _:
-          return false;
+        //case Brep _:
+        //case Mesh _:
 
         case BlockDefinition _:
-          return true;
-
         case BlockInstance _:
           return true;
 

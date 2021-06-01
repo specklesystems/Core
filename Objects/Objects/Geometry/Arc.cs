@@ -63,7 +63,9 @@ namespace Objects.Geometry
       list.Add(domain.end ?? 0);
 
       list.AddRange(plane.ToList());
-
+      list.AddRange(startPoint.ToList());
+      list.AddRange(midPoint.ToList());
+      list.AddRange(endPoint.ToList());
       list.Add(Units.GetEncodingFromUnit(units));
       list.Insert(0, CurveTypeEncoding.Arc);
       list.Insert(0, list.Count);
@@ -79,8 +81,13 @@ namespace Objects.Geometry
       arc.endAngle = list[4];
       arc.angleRadians = list[5];
       arc.domain = new Interval(list[6], list[7]);
-      arc.plane = Plane.FromList(list.GetRange(8, 12));
       arc.units = Units.GetUnitFromEncoding(list[list.Count - 1]);
+      arc.plane = Plane.FromList(list.GetRange(8, 13));
+      arc.startPoint = Point.FromList(list.GetRange(21,3), arc.units);
+      arc.midPoint = Point.FromList(list.GetRange(24,3), arc.units);
+      arc.endPoint = Point.FromList(list.GetRange(27,3), arc.units);
+      arc.plane.units = arc.units;
+
       return arc;
     }
   }

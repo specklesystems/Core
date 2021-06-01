@@ -1,4 +1,4 @@
-﻿using Grasshopper.Kernel.Types;
+using Grasshopper.Kernel.Types;
 using Speckle.Core.Kits;
 using Speckle.Core.Models;
 using System;
@@ -142,6 +142,7 @@ namespace ConnectorGrasshopper.Extras
       var copy = @base.ShallowCopy();
       copy.GetMembers().ToList().ForEach(keyval =>
       {
+        // TODO: Handle dicts!!!
         if (keyval.Value is IList list)
         {
           var converted = new List<object>();
@@ -188,6 +189,7 @@ namespace ConnectorGrasshopper.Extras
       var copy = @base.ShallowCopy();
       copy.GetMembers().ToList().ForEach(keyval =>
       {
+        // TODO: Handle dicts!!
         if (keyval.Value is IList list)
         {
           var converted = new List<object>();
@@ -235,12 +237,19 @@ namespace ConnectorGrasshopper.Extras
       {
         if (converter.CanConvertToNative(@base))
         {
-          var converted = converter.ConvertToNative(@base);
-          var geomgoo = GH_Convert.ToGoo(converted);
-          if (geomgoo != null) 
-            return geomgoo;
-          var goo = new GH_ObjectWrapper { Value = converted };
-          return goo;
+          try
+          {
+            var converted = converter.ConvertToNative(@base);
+            var geomgoo = GH_Convert.ToGoo(converted);
+            if (geomgoo != null) 
+              return geomgoo;
+            var goo = new GH_ObjectWrapper { Value = converted };
+            return goo;
+          }
+          catch (Exception e)
+          {
+            converter.ConversionErrors.Add(new Exception($"Could not convert {@base}", e));
+          }
         }
         if(recursive)
         {
