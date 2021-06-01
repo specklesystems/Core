@@ -14,7 +14,7 @@ namespace ConnectorGrasshopper.Streams
 {
   public class AccountDetailsComponent : GH_Component
   {
-    public AccountDetailsComponent() : base("Account Details", "AccDet", "Gets the details from a specific account", ComponentCategories.PRIMARY_RIBBON,
+    public AccountDetailsComponent() : base("Account Details", "AccDet", "Displays the details of the given Speckle account(s).", ComponentCategories.PRIMARY_RIBBON,
       ComponentCategories.STREAMS)
     {
     }
@@ -27,7 +27,7 @@ namespace ConnectorGrasshopper.Streams
 
     protected override void RegisterInputParams(GH_InputParamManager pManager)
     {
-      var acc = pManager.AddTextParameter("Account", "A", "Account to get stream with.", GH_ParamAccess.item);
+      var acc = pManager.AddTextParameter("Account", "A", "The Speckle account(s) to retrieve details from. Use the List Accounts node to see which accounts are available.", GH_ParamAccess.item);
 
       Params.Input[acc].Optional = true;
     }

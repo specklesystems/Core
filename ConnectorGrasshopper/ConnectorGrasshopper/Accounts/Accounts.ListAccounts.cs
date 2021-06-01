@@ -23,7 +23,7 @@ namespace ConnectorGrasshopper.Accounts
 
     public override string SubCategory { get => ComponentCategories.STREAMS; }
 
-    public override string Description { get => "A dropdown list of your existing Speckle accounts."; }
+    public override string Description { get => "Displays a drop-down list of available Speckle accounts. Use the Speckle Manager application to manage your accounts."; }
 
     public override string Name { get => "List Accounts"; }
 
