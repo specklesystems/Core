@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json.Serialization;
 using Dynamo.Graph.Nodes;
 using Dynamo.Utilities;
+using Newtonsoft.Json;
 using ProtoCore.AST.AssociativeAST;
 using Speckle.Core.Logging;
 
@@ -13,7 +13,7 @@ namespace Speckle.ConnectorDynamo.Streams
   [NodeCategory("Speckle 2.Streams.Query")]
   [NodeDescription("Extracts the details of a given stream, or list of streams. Use is limited to max 20 streams.")]
   [InPortNames("streamUrl")]
-  [InPortTypes("string")]
+  [InPortTypes("System.String")]
   [InPortDescriptions("URL of the Speckle stream(s) to retrieve details from. Can be the URL of a stream, branch or commit or object.")]
   [OutPortNames("details")]
   [OutPortTypes("System.String[]")]
@@ -24,7 +24,6 @@ namespace Speckle.ConnectorDynamo.Streams
   {
     public StreamDetails()
     {
-      Tracker.TrackPageview(Tracker.STREAM_DETAILS);
       RegisterAllPorts();
       ArgumentLacing = LacingStrategy.Disabled;
     }
@@ -32,7 +31,23 @@ namespace Speckle.ConnectorDynamo.Streams
     [JsonConstructor]
     private StreamDetails(IEnumerable<PortModel> inPorts, IEnumerable<PortModel> outPorts) : base(inPorts, outPorts)
     {
-    
+      if (inPorts.Count() == 1) {}
+      else
+      {
+        InPorts.Clear();
+        AddInputs();
+      }
+      if (outPorts.Count() == 0) AddOutputs();
+    }
+
+    private void AddInputs()
+    {
+      InPorts.Add(new PortModel(PortType.Input, this, new PortData("streamUrl", "URL of the Speckle stream(s) to retrieve details from. Can be the URL of a stream, branch or commit or object.")));
+    }
+
+    private void AddOutputs()
+    {
+      OutPorts.Add(new PortModel(PortType.Output, this, new PortData("details", "Details from the stream(s) that were given.")));
     }
 
     public override IEnumerable<AssociativeNode> BuildOutputAst(List<AssociativeNode> inputAstNodes)

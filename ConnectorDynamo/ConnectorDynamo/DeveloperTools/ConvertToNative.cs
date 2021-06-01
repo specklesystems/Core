@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json.Serialization;
-using Autodesk.DesignScript.Runtime;
+
 using Dynamo.Graph.Nodes;
 using Dynamo.Utilities;
+using Newtonsoft.Json;
 using ProtoCore.AST.AssociativeAST;
 using Speckle.ConnectorDynamo.Functions;
 using Speckle.Core.Logging;
@@ -12,36 +12,35 @@ using Speckle.Core.Models;
 
 namespace Speckle.ConnectorDynamo.Developer
 {
-  [NodeName("Convert To Speckle")]
-  [NodeCategory("Speckle 2.Developer.Conversion.Actions")]
-  [NodeDescription("Converts an object from its native representation to Speckle's object model.")]
+  [NodeName("Convert To Native")]
+  [NodeCategory("Speckle 2.Developer Tools.Conversion.Actions")]
+  [NodeDescription("Converts an object from its Speckle representation to the native application's object model.")]
+  [InPortNames("base")]
+  [InPortTypes("Speckle.Core.Models.Base")]
   [InPortDescriptions("An object deriving from Speckle's base object.")]
-  [InPortNames("nativeObject")]
-  [InPortTypes("object")]
-  [OutPortNames("base")]
-  [OutPortTypes("Speckle.Core.Models.Base")]
-  [OutPortDescriptions("The given object in Speckle's object model.")]
-  [NodeSearchTags("speckle", "developer", "convert")]
+  [OutPortNames("nativeObject")]
+  [OutPortTypes("object")]
+  [OutPortDescriptions("The given object in the application's native object model.")]
+  [NodeSearchTags("speckle", "developer", "convert", "native")]
   [IsDesignScriptCompatible]
-  public class ConvertToSpeckle : NodeModel
+  public class ConvertToNative : NodeModel
   {
-    public ConvertToSpeckle()
+    public ConvertToNative()
     {
       RegisterAllPorts();
       ArgumentLacing = LacingStrategy.Disabled;
     }
 
     [JsonConstructor]
-    private ConvertToSpeckle(IEnumerable<PortModel> inPorts, IEnumerable<PortModel> outPorts) : base(inPorts, outPorts)
+    private ConvertToNative(IEnumerable<PortModel> inPorts, IEnumerable<PortModel> outPorts) : base(inPorts, outPorts)
     {
 
     }
-
-    private static Base ToSpeckle([ArbitraryDimensionArrayImport] object data)
+    private static object ToNative(Base @base)
     {
-      Tracker.TrackPageview(Tracker.CONVERT_TOSPECKLE);
+      Tracker.TrackPageview(Tracker.CONVERT_TONATIVE);
       var converter = new BatchConverter();
-      return converter.ConvertRecursivelyToSpeckle(data);
+      return converter.ConvertRecursivelyToNative(@base);
     }
 
     public override IEnumerable<AssociativeNode> BuildOutputAst(List<AssociativeNode> inputAstNodes)
@@ -56,7 +55,7 @@ namespace Speckle.ConnectorDynamo.Developer
 
       AssociativeNode functionCall = AstFactory.BuildFunctionCall
       (
-        new Func<object, object>(ToSpeckle),
+        new Func<Base, object>(ToNative),
         new List<AssociativeNode> { inputAstNodes[0] }
       );
 

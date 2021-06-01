@@ -111,16 +111,16 @@
     </Compile>
     <Compile Include="Accounts\SelectAccountViewCustomization.cs" />
     <Compile Include="Accounts\AccountDetails.cs" />
-    <Compile Include="Developer\ConvertToNative.cs" />
-    <Compile Include="Developer\ConvertToSpeckle.cs" />
-    <Compile Include="Developer\LocalSendData.cs" />
-    <Compile Include="Developer\LocalReceiveData.cs" />
-    <Compile Include="Developer\JsonDeserialize.cs" />
-    <Compile Include="Developer\JsonSerialize.cs" />
-    <Compile Include="Developer\TransportDisk.cs" />
-    <Compile Include="Developer\TransportMemory.cs" />
-    <Compile Include="Developer\TransportServer.cs" />
-    <Compile Include="Developer\TransportSqLite.cs" />
+    <Compile Include="DeveloperTools\ConvertToNative.cs" />
+    <Compile Include="DeveloperTools\ConvertToSpeckle.cs" />
+    <Compile Include="DeveloperTools\LocalSendData.cs" />
+    <Compile Include="DeveloperTools\LocalReceiveData.cs" />
+    <Compile Include="DeveloperTools\JsonDeserialize.cs" />
+    <Compile Include="DeveloperTools\JsonSerialize.cs" />
+    <Compile Include="DeveloperTools\TransportDisk.cs" />
+    <Compile Include="DeveloperTools\TransportMemory.cs" />
+    <Compile Include="DeveloperTools\TransportServer.cs" />
+    <Compile Include="DeveloperTools\TransportSqLite.cs" />
     <Compile Include="Streams\CreateStreamUi.xaml.cs">
       <DependentUpon>CreateStreamUi.xaml</DependentUpon>
     </Compile>

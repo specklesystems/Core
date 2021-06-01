@@ -1,45 +1,48 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json.Serialization;
+
+using Autodesk.DesignScript.Runtime;
 using Dynamo.Graph.Nodes;
 using Dynamo.Utilities;
+using Newtonsoft.Json;
 using ProtoCore.AST.AssociativeAST;
-using Speckle.Core.Api;
+using Speckle.ConnectorDynamo.Functions;
 using Speckle.Core.Logging;
 using Speckle.Core.Models;
 
 namespace Speckle.ConnectorDynamo.Developer
 {
-  [NodeName("Serialize to JSON")]
-  [NodeCategory("Speckle 2.Developer.Serialize.Actions")]
-  [NodeDescription("Serializes an object to JSON.")]
-  [InPortNames("object")]
+  [NodeName("Convert To Speckle")]
+  [NodeCategory("Speckle 2.Developer Tools.Conversion.Actions")]
+  [NodeDescription("Converts an object from its native representation to Speckle's object model.")]
+  [InPortDescriptions("An object deriving from Speckle's base object.")]
+  [InPortNames("nativeObject")]
   [InPortTypes("object")]
-  [InPortDescriptions("An object to be serialized.")]
-  [OutPortNames("json")]
-  [OutPortTypes("string")]
-  [OutPortDescriptions("The given object(s) serialized to JSON.")]
-  [NodeSearchTags("speckle", "developer", "serialize", "JSON")]
+  [OutPortNames("base")]
+  [OutPortTypes("Speckle.Core.Models.Base")]
+  [OutPortDescriptions("The given object in Speckle's object model.")]
+  [NodeSearchTags("speckle", "developer", "convert")]
   [IsDesignScriptCompatible]
-  public class JsonSerialize : NodeModel
+  public class ConvertToSpeckle : NodeModel
   {
-    public JsonSerialize()
+    public ConvertToSpeckle()
     {
       RegisterAllPorts();
       ArgumentLacing = LacingStrategy.Disabled;
     }
 
     [JsonConstructor]
-    private JsonSerialize(IEnumerable<PortModel> inPorts, IEnumerable<PortModel> outPorts) : base(inPorts, outPorts)
+    private ConvertToSpeckle(IEnumerable<PortModel> inPorts, IEnumerable<PortModel> outPorts) : base(inPorts, outPorts)
     {
 
     }
-    
-    public static string Serialize(Base @base)
+
+    private static Base ToSpeckle([ArbitraryDimensionArrayImport] object data)
     {
-      Tracker.TrackPageview(Tracker.SERIALIZE);
-      return Operations.Serialize(@base);
+      Tracker.TrackPageview(Tracker.CONVERT_TOSPECKLE);
+      var converter = new BatchConverter();
+      return converter.ConvertRecursivelyToSpeckle(data);
     }
 
     public override IEnumerable<AssociativeNode> BuildOutputAst(List<AssociativeNode> inputAstNodes)
@@ -54,7 +57,7 @@ namespace Speckle.ConnectorDynamo.Developer
 
       AssociativeNode functionCall = AstFactory.BuildFunctionCall
       (
-        new Func<Base, object>(Serialize),
+        new Func<object, object>(ToSpeckle),
         new List<AssociativeNode> { inputAstNodes[0] }
       );
 

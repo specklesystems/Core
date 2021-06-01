@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Autodesk.DesignScript.Runtime;
 using Dynamo.Graph.Nodes;
 using Dynamo.Utilities;
+using Newtonsoft.Json;
 using ProtoCore.AST.AssociativeAST;
 using Speckle.ConnectorDynamo.Functions;
 using Speckle.Core.Api;
@@ -12,39 +13,40 @@ using Speckle.Core.Logging;
 
 namespace Speckle.ConnectorDynamo.Developer
 {
-  [NodeName("Receive Local Data")]
-  [NodeCategory("Speckle 2.Developer.Local.Actions")]
-  [NodeDescription("Receives data locally, without requiring a Speckle Server.\nNOTE: Updates will not be received automatically.")]
-  [InPortNames("localDataId")]
-  [InPortTypes("string")]
-  [InPortDescriptions("ID of the local data to receive.")]
-  [OutPortNames("data")]
-  [OutPortTypes("var")]
-  [OutPortDescriptions("The received data.")]
-  [NodeSearchTags("speckle", "developer", "local", "receive")]
+  [NodeName("Send Local Data")]
+  [NodeCategory("Speckle 2.Developer Tools.Local.Actions")]
+  [NodeDescription("Sends data locally, without requiring a Speckle Server.")]
+  [InPortNames("data")]
+  [InPortTypes("var")]
+  [InPortDescriptions("The data to be sent locally.")]
+  [OutPortNames("localDataId")]
+  [OutPortTypes("string")]
+  [OutPortDescriptions("Id of the data that was sent locally.")]
+  [NodeSearchTags("speckle", "developer", "local", "send")]
   [IsDesignScriptCompatible]
-  public class LocalReceiveData : NodeModel
+  public class LocalSendData : NodeModel
   {
-    public LocalReceiveData()
+    public LocalSendData()
     {
       RegisterAllPorts();
       ArgumentLacing = LacingStrategy.Disabled;
     }
 
     [JsonConstructor]
-    private LocalReceiveData(IEnumerable<PortModel> inPorts, IEnumerable<PortModel> outPorts) : base(inPorts, outPorts)
+    private LocalSendData(IEnumerable<PortModel> inPorts, IEnumerable<PortModel> outPorts) : base(inPorts, outPorts)
     {
 
     }
 
-    public static object Receive(string localDataId)
+    public static string Send([ArbitraryDimensionArrayImport] object data)
     {
-      Tracker.TrackPageview(Tracker.RECEIVE_LOCAL);
+      Tracker.TrackPageview(Tracker.SEND_LOCAL);
 
-      var @base = Task.Run(async () => await Operations.Receive(localDataId)).Result;
       var converter = new BatchConverter();
-      var data = converter.ConvertRecursivelyToNative(@base);
-      return data;
+      var @base = converter.ConvertRecursivelyToSpeckle(data);
+      var objectId = Task.Run(async () => await Operations.Send(@base)).Result;
+
+      return objectId;
     }
 
     public override IEnumerable<AssociativeNode> BuildOutputAst(List<AssociativeNode> inputAstNodes)
@@ -59,7 +61,7 @@ namespace Speckle.ConnectorDynamo.Developer
 
       AssociativeNode functionCall = AstFactory.BuildFunctionCall
       (
-        new Func<string, object>(Receive),
+        new Func<string, object>(Send),
         new List<AssociativeNode> { inputAstNodes[0] }
       );
 

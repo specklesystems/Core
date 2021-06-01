@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json.Serialization;
+
 using Dynamo.Graph.Nodes;
 using Dynamo.Utilities;
+using Newtonsoft.Json;
 using ProtoCore.AST.AssociativeAST;
 using Speckle.Core.Logging;
 using Speckle.Core.Transports;
@@ -11,7 +12,7 @@ using Speckle.Core.Transports;
 namespace Speckle.ConnectorDynamo.Developer
 {
   [NodeName("Memory Transport")]
-  [NodeCategory("Speckle 2.Developer.Transport.Actions")]
+  [NodeCategory("Speckle 2.Developer Tools.Transport.Actions")]
   [NodeDescription("Creates an Memory Transport.")]
   [InPortNames("name")]
   [InPortTypes("string")]

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json.Serialization;
 using Dynamo.Graph.Nodes;
 using Dynamo.Utilities;
+using Newtonsoft.Json;
 using ProtoCore.AST.AssociativeAST;
 
 namespace Speckle.ConnectorDynamo.Streams
@@ -23,6 +23,9 @@ namespace Speckle.ConnectorDynamo.Streams
   {
     public GetStream()
     {
+      AddInputs();
+      AddOutputs();
+
       RegisterAllPorts();
       ArgumentLacing = LacingStrategy.Disabled;
     }
@@ -30,7 +33,28 @@ namespace Speckle.ConnectorDynamo.Streams
     [JsonConstructor]
     private GetStream(IEnumerable<PortModel> inPorts, IEnumerable<PortModel> outPorts) : base(inPorts, outPorts)
     {
+      if(inPorts.Count() == 2) {}
+      else
+      {
+        InPorts.Clear();
+        AddInputs();
+      }
+      if(outPorts.Count() == 1) {}
+      else
+      {
+        AddOutputs();
+      }
+    }
 
+    private void AddInputs()
+    {
+      InPorts.Add(new PortModel(PortType.Input, this, new PortData("streamUrl", "URL of the Speckle stream(s) to retrieve details from. Can be the URL of a stream, branch or commit or object.")));
+      InPorts.Add(new PortModel(PortType.Input, this, new PortData("account", "A Speckle account. Use the Select Account node to retrieve Speckle accounts.")));
+    }
+
+    private void AddOutputs()
+    {
+      OutPorts.Add(new PortModel(PortType.Output, this, new PortData("streamUrls", "The URL of one (or more) Speckle stream(s).")));
     }
 
     public override IEnumerable<AssociativeNode> BuildOutputAst(List<AssociativeNode> inputAstNodes)

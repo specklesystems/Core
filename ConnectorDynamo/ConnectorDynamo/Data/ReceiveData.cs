@@ -25,9 +25,11 @@ namespace Speckle.ConnectorDynamo.Data
   [NodeCategory("Speckle 2.Data.Create")]
   [NodeDescription("Receives data from a Speckle stream, given its URL.")]
   [InPortNames("streamUrl")]
-  [InPortDescriptions("URL of the Speckle stream(s) to retrieve details from.Can be the URL of a stream, branch or commit or object.")]
+  [InPortTypes("System.String")]
+  [InPortDescriptions("URL of the Speckle stream(s) to retrieve details from. Can be the URL of a stream, branch or commit or object.")]
   [OutPortNames("data", "info")]
-  [OutPortDescriptions("Any data which was retrieved from the given Speckle stream.", "Metadata relating to this stream.")]
+  [OutPortTypes("var", "string[]")]
+  [OutPortDescriptions("Data received from the Speckle stream.", "Information about the specific commit your data was retrieved from.")]
   [NodeSearchTags("receive", "get", "stream", "data", "speckle")]
   [IsDesignScriptCompatible]
   public class ReceiveData : NodeModel

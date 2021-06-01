@@ -16,9 +16,10 @@ namespace Speckle.ConnectorDynamo.Accounts
   /// </summary>
   [NodeName("Select Account")]
   [NodeCategory("Speckle 2.Accounts.Create")]
-  [NodeDescription("Displays a drop-down list of Speckle accounts to choose from.")]
+  [NodeDescription("Displays a drop-down list of available Speckle accounts. Use the Speckle Manager application to manage your accounts.")]
   [OutPortNames("account")]
-  [OutPortDescriptions("The chosen Speckle account.")]
+  [OutPortDescriptions("The selected Speckle account.")]
+  [OutPortTypes("Speckle.Core.Credentials.Account")]
   [NodeSearchTags("accounts", "account", "select", "user", "speckle")]
   [IsDesignScriptCompatible]
   public class SelectAccount : NodeModel

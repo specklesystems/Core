@@ -1,45 +1,51 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json.Serialization;
+
+using System.Threading.Tasks;
 using Dynamo.Graph.Nodes;
 using Dynamo.Utilities;
+using Newtonsoft.Json;
 using ProtoCore.AST.AssociativeAST;
 using Speckle.ConnectorDynamo.Functions;
+using Speckle.Core.Api;
 using Speckle.Core.Logging;
-using Speckle.Core.Models;
 
 namespace Speckle.ConnectorDynamo.Developer
 {
-  [NodeName("Convert To Native")]
-  [NodeCategory("Speckle 2.Developer.Conversion.Actions")]
-  [NodeDescription("Converts an object from its Speckle representation to the native application's object model.")]
-  [InPortNames("base")]
-  [InPortTypes("Speckle.Core.Models.Base")]
-  [InPortDescriptions("An object deriving from Speckle's base object.")]
-  [OutPortNames("nativeObject")]
-  [OutPortTypes("object")]
-  [OutPortDescriptions("The given object in the application's native object model.")]
-  [NodeSearchTags("speckle", "developer", "convert", "native")]
+  [NodeName("Receive Local Data")]
+  [NodeCategory("Speckle 2.Developer Tools.Local.Actions")]
+  [NodeDescription("Receives data locally, without requiring a Speckle Server.\nNOTE: Updates will not be received automatically.")]
+  [InPortNames("localDataId")]
+  [InPortTypes("string")]
+  [InPortDescriptions("ID of the local data to receive.")]
+  [OutPortNames("data")]
+  [OutPortTypes("var")]
+  [OutPortDescriptions("The received data.")]
+  [NodeSearchTags("speckle", "developer", "local", "receive")]
   [IsDesignScriptCompatible]
-  public class ConvertToNative : NodeModel
+  public class LocalReceiveData : NodeModel
   {
-    public ConvertToNative()
+    public LocalReceiveData()
     {
       RegisterAllPorts();
       ArgumentLacing = LacingStrategy.Disabled;
     }
 
     [JsonConstructor]
-    private ConvertToNative(IEnumerable<PortModel> inPorts, IEnumerable<PortModel> outPorts) : base(inPorts, outPorts)
+    private LocalReceiveData(IEnumerable<PortModel> inPorts, IEnumerable<PortModel> outPorts) : base(inPorts, outPorts)
     {
 
     }
-    private static object ToNative(Base @base)
+
+    public static object Receive(string localDataId)
     {
-      Tracker.TrackPageview(Tracker.CONVERT_TONATIVE);
+      Tracker.TrackPageview(Tracker.RECEIVE_LOCAL);
+
+      var @base = Task.Run(async () => await Operations.Receive(localDataId)).Result;
       var converter = new BatchConverter();
-      return converter.ConvertRecursivelyToNative(@base);
+      var data = converter.ConvertRecursivelyToNative(@base);
+      return data;
     }
 
     public override IEnumerable<AssociativeNode> BuildOutputAst(List<AssociativeNode> inputAstNodes)
@@ -54,7 +60,7 @@ namespace Speckle.ConnectorDynamo.Developer
 
       AssociativeNode functionCall = AstFactory.BuildFunctionCall
       (
-        new Func<Base, object>(ToNative),
+        new Func<string, object>(Receive),
         new List<AssociativeNode> { inputAstNodes[0] }
       );
 

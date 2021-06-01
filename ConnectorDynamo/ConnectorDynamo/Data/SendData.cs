@@ -26,9 +26,9 @@ namespace Speckle.ConnectorDynamo.Data
   [NodeDescription("Sends data to a Speckle stream, given its URL.")]
   [InPortNames("data", "streamUrl", "message")]
   [InPortDescriptions(
-    "The data you want to send to the given URL",
+    "The data you want to send to the stream at the given URL",
     "URL of the Speckle stream(s) to retrieve details from. Can be the URL of a stream, branch or commit or object.",
-    "Optional: A short message describing the data you're uploading.")
+    "An optional message to describe what you're sending. If left blank, one will be generated for you.")
   ]
   [OutPortNames("streamUrl")]
   [OutPortDescriptions("URL of the Speckle stream the given data has been sent to.")]
@@ -199,8 +199,8 @@ namespace Speckle.ConnectorDynamo.Data
     {
       var defaultMessageValue = new StringNode { Value = "Automatic commit from Dynamo" };
 
-      InPorts.Add(new PortModel(PortType.Input, this, new PortData("data", "Input the data you want to send, such as Dynamo geometry.")));
-      InPorts.Add(new PortModel(PortType.Input, this, new PortData("streamUrl", "The stream(s) you want to send data to. Can be the URL of a stream, branch, commit or object.")));
+      InPorts.Add(new PortModel(PortType.Input, this, new PortData("data", "The data you want to send to the stream at the given URL")));
+      InPorts.Add(new PortModel(PortType.Input, this, new PortData("streamUrl", "URL of the Speckle stream(s) to retrieve details from. Can be the URL of a stream, branch or commit or object.")));
       InPorts.Add(new PortModel(PortType.Input, this,
         new PortData("message", "An optional message to describe what you're sending. If left blank, one will be generated for you.", defaultMessageValue)
         {

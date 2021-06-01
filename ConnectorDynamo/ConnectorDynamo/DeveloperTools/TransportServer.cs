@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Text.Json.Serialization;
+
 using Dynamo.Graph.Nodes;
 using Dynamo.Utilities;
+using Newtonsoft.Json;
 using ProtoCore.AST.AssociativeAST;
 using Speckle.Core.Credentials;
 using Speckle.Core.Logging;
@@ -13,7 +14,7 @@ using Speckle.Core.Transports;
 namespace Speckle.ConnectorDynamo.Developer
 {
   [NodeName("Server Transport")]
-  [NodeCategory("Speckle 2.Developer.Transport.Actions")]
+  [NodeCategory("Speckle 2.Developer Tools.Transport.Actions")]
   [NodeDescription("Creates a server transport.")]
   [InPortNames("stream")]
   [InPortTypes("object")]

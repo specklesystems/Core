@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json.Serialization;
+
 using Dynamo.Graph.Nodes;
 using Dynamo.Utilities;
+using Newtonsoft.Json;
 using ProtoCore.AST.AssociativeAST;
 using Speckle.Core.Api;
 using Speckle.Core.Logging;
@@ -11,7 +12,7 @@ using Speckle.Core.Logging;
 namespace Speckle.ConnectorDynamo.Developer
 {
   [NodeName("Deserialize from JSON")]
-  [NodeCategory("Speckle 2.Developer.Serialize.Actions")]
+  [NodeCategory("Speckle 2.Developer Tools.Serialize.Actions")]
   [NodeDescription("Deserializes an object from JSON.")]
   [InPortNames("json")]
   [InPortTypes("string")]

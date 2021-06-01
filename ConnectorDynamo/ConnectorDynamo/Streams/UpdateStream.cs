@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json.Serialization;
+
 using Dynamo.Graph.Nodes;
 using Dynamo.Utilities;
+using Newtonsoft.Json;
 using ProtoCore.AST.AssociativeAST;
 using Speckle.Core.Logging;
 
@@ -31,7 +32,6 @@ namespace Speckle.ConnectorDynamo.Streams
   {
     public UpdateStream()
     {
-      Tracker.TrackPageview(Tracker.STREAM_UPDATE);
       RegisterAllPorts();
       ArgumentLacing = LacingStrategy.Disabled;
     }

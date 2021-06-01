@@ -17,7 +17,7 @@ namespace Speckle.ConnectorDynamo.Functions
   public static class Stream
   {
     [IsVisibleInDynamoLibrary(false)]
-    public static object GetStream([ArbitraryDimensionArrayImport] object streamUrl, [DefaultArgument("null")] Core.Credentials.Account account)
+    public static object GetStream(object streamUrl, Core.Credentials.Account account)
     {
       Tracker.TrackPageview(Tracker.STREAM_GET);
 
