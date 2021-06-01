@@ -24,7 +24,7 @@ namespace ConnectorGrasshopper.Ops
     public ISpeckleConverter Converter;
 
     public ISpeckleKit Kit;
-    public ReceiveLocalComponent() : base("Local Receive", "LR",
+    public ReceiveLocalComponent() : base("Receive Local Data", "LR",
       "Receives data locally, without the need of a Speckle Server. NOTE: updates will not be automatically received.",
       ComponentCategories.SECONDARY_RIBBON, ComponentCategories.LOCAL)
     {

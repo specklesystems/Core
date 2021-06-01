@@ -12,17 +12,17 @@ namespace Speckle.Core.Models
 {
 
   /// <summary>
-  /// Base class for all Speckle object definitions. Provides unified hashing, type extraction and serialisation.
+  /// Base class for all Speckle object definitions. Provides unified hashing, type extraction and serialization.
   /// <para>When developing a speckle kit, use this class as a parent class.</para>
   /// <para><b>Dynamic properties naming conventions:</b></para>
-  /// <para>👉 "__" at the start of a property means it will be ignored, both for hashing and serialisation (e.g., "__ignoreMe").</para>
-  /// <para>👉 "@" at the start of a property name means it will be detached (when serialised with a transport) (e.g.((dynamic)obj)["@meshEquivalent"] = ...) .</para>
+  /// <para>👉 "__" at the start of a property means it will be ignored, both for hashing and serialization (e.g., "__ignoreMe").</para>
+  /// <para>👉 "@" at the start of a property name means it will be detached (when serialized with a transport) (e.g.((dynamic)obj)["@meshEquivalent"] = ...) .</para>
   /// </summary>
   [Serializable]
   public class Base : DynamicBase
   {
     /// <summary>
-    /// A speckle object's id is an unique hash based on its properties. <b>NOTE: this field will be null unless the object was deserialised from a source. Use the <see cref="GetId(bool)"/> function to get it.</b>
+    /// A speckle object's id is an unique hash based on its properties. <b>NOTE: this field will be null unless the object was deserialized from a source. Use the <see cref="GetId(bool)"/> function to get it.</b>
     /// </summary>
     [SchemaIgnore]
     public virtual string id

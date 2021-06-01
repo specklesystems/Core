@@ -62,7 +62,7 @@ namespace Speckle.Core.Api
     /// <summary>
     /// Deserializes a given object. Note: if you want to pull an object from a Speckle Transport or Server, please use any of the <see cref="Receive(string, Transports.ITransport, Transports.ITransport, Action{System.Collections.Concurrent.ConcurrentDictionary{string, int}})"/>.
     /// </summary>
-    /// <param name="object">The json string representation of a speckle object that you want to deserialise.</param>
+    /// <param name="object">The json string representation of a speckle object that you want to deserialize.</param>
     /// <returns></returns>
     public static Base Deserialize(string @object)
     {
@@ -72,7 +72,7 @@ namespace Speckle.Core.Api
     /// <summary>
     /// Deserializes a given object. Note: if you want to pull an object from a Speckle Transport or Server, please use any of the <see cref="Receive(string, Transports.ITransport, Transports.ITransport, Action{System.Collections.Concurrent.ConcurrentDictionary{string, int}})"/>.
     /// </summary>
-    /// <param name="object">The json string representation of a speckle object that you want to deserialise.</param>
+    /// <param name="object">The json string representation of a speckle object that you want to deserialize.</param>
     /// <param name="cancellationToken">Propagates notification that operations should be canceled.</param>
     /// <returns></returns>
     public static Base Deserialize(string @object, CancellationToken cancellationToken)

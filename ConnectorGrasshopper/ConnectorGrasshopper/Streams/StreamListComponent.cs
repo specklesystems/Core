@@ -14,7 +14,7 @@ namespace ConnectorGrasshopper.Streams
 {
   public class StreamListComponent : GH_Component
   {
-    public StreamListComponent() : base("Stream List", "sList", "Lists all the streams for this account", ComponentCategories.PRIMARY_RIBBON,
+    public StreamListComponent() : base("List Streams", "sList", "Lists all the streams for this account", ComponentCategories.PRIMARY_RIBBON,
       ComponentCategories.STREAMS)
     { }
 

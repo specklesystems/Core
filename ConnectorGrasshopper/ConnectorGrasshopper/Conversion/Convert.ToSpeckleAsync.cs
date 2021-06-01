@@ -28,7 +28,7 @@ namespace ConnectorGrasshopper.Conversion
     public override GH_Exposure Exposure => GH_Exposure.primary;
 
 
-    public ToSpeckleConverterAsync() : base("To Speckle", "To Speckle", "Convert data from Rhino to their Speckle Base equivalent.", ComponentCategories.SECONDARY_RIBBON, ComponentCategories.CONVERSION)
+    public ToSpeckleConverterAsync() : base("Convert To Speckle", "To Speckle", "Convert data from Rhino to their Speckle Base equivalent.", ComponentCategories.SECONDARY_RIBBON, ComponentCategories.CONVERSION)
     {
     }
     

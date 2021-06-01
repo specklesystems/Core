@@ -258,7 +258,7 @@ namespace Speckle.Core.Serialisation
 
     #region Write Json
 
-    // Keeps track of the actual tree structure of the objects being serialised.
+    // Keeps track of the actual tree structure of the objects being serialized.
     // These tree references will thereafter be stored in the __tree prop. 
     private void TrackReferenceInTree(string refId)
     {
@@ -287,7 +287,7 @@ namespace Speckle.Core.Serialisation
 
     // While this function looks complicated, it's actually quite smooth:
     // The important things to remember is that serialization goes depth first:
-    // The first object to get fully serialised is the first nested one, with
+    // The first object to get fully serialized is the first nested one, with
     // the parent object being last. 
     public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
     {
@@ -502,7 +502,7 @@ namespace Speckle.Core.Serialisation
 
       var type = value.GetType();
 
-      // TODO: List handling and dictionary serialisation handling can be sped up significantly if we first check by their inner type.
+      // TODO: List handling and dictionary serialization handling can be sped up significantly if we first check by their inner type.
       // This handles a broader case in which we are, essentially, checking only for object[] or List<object> / Dictionary<string, object> cases.
       // A much faster approach is to check for List<primitive>, where primitive = string, number, etc. and directly serialize it in full.
       // Same goes for dictionaries.

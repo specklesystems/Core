@@ -53,7 +53,8 @@
     <Compile Include="Accounts\Accounts.ListAccounts.cs" />
     <Compile Include="ComponentCategories.cs" />
     <Compile Include="Conversion\Convert.ToSpeckleAsync.cs" />
-    <Compile Include="Conversion\Serialisation.SerialiseObject.cs" />
+    <Compile Include="Conversion\Serialization.DeserializeObject.cs" />
+    <Compile Include="Conversion\Serialization.SerialiseObject.cs" />
     <Compile Include="Extras\GenericAccessParam.cs" />
     <Compile Include="Conversion\Convert.ToNativeAsync.cs" />
     <Compile Include="Extras\Speckle.IGH_Goo.cs" />
@@ -100,9 +101,6 @@
     <Compile Include="Transports\Transports.Memory.cs" />
     <Compile Include="Transports\Transports.Server.cs" />
     <Compile Include="Transports\Transports.Sqlite.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Conversion\Serialisation.DeserializeObject.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Core\Core\Core.csproj">

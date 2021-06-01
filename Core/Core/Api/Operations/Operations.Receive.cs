@@ -67,7 +67,7 @@ namespace Speckle.Core.Api
       serializer.OnErrorAction = onErrorAction;
       serializer.CancellationToken = cancellationToken;
 
-      // First we try and get the object from the local transport. If it's there, we assume all its children are there, and proceed with deserialisation. 
+      // First we try and get the object from the local transport. If it's there, we assume all its children are there, and proceed with deserialization. 
       // This assumption is hard-wired into the SDK. Read below. 
       var objString = localTransport.GetObject(objectId);
 
@@ -97,12 +97,12 @@ namespace Speckle.Core.Api
       // Wait for the local transport to finish "writing" - in this case, it signifies that the remote transport has done pushing copying objects into it. (TODO: I can see some scenarios where latency can screw things up, and we should rather wait on the remote transport).
       await localTransport.WriteComplete();
 
-      // Proceed to deserialise the object, now safely knowing that all its children are present in the local (fast) transport. 
+      // Proceed to deserialize the object, now safely knowing that all its children are present in the local (fast) transport. 
       return JsonConvert.DeserializeObject<Base>(objString, settings);
 
       // Summary: 
       // Basically, receiving an object (and all its subchildren) operates with two transports, one that is potentially slow, and one that is fast. 
-      // The fast transport ("localTransport") is used syncronously inside the deserialisation routine to get the value of nested references and set them. The slow transport ("remoteTransport") is used to get the raw data and populate the local transport with all necessary data for a successful deserialisation of the object. 
+      // The fast transport ("localTransport") is used syncronously inside the deserialization routine to get the value of nested references and set them. The slow transport ("remoteTransport") is used to get the raw data and populate the local transport with all necessary data for a successful deserialisation of the object. 
       // Note: if properly implemented, there is no hard distinction between what is a local or remote transport; it's still just a transport. So, for example, if you want to receive an object without actually writing it first to a local transport, you can just pass a Server/S3 transport as a local transport. 
       // This is not reccommended, but shows what you can do. Another tidbit: the local transport does not need to be disk-bound; it can easily be an in memory transport. In memory transports are the fastest ones, but they're of limited use for more 
     }

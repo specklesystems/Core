@@ -25,7 +25,7 @@ namespace ConnectorGrasshopper.Accounts
 
     public override string Description { get => "A dropdown list of your existing Speckle accounts."; }
 
-    public override string Name { get => "Accounts"; }
+    public override string Name { get => "List Accounts"; }
 
     public override GH_Exposure Exposure => GH_Exposure.primary;
 

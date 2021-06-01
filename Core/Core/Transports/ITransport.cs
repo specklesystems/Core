@@ -45,7 +45,7 @@ namespace Speckle.Core.Transports
     public void SaveObject(string id, string serializedObject);
 
     /// <summary>
-    /// Saves an object, retrieveing its serialised version from the provided transport. 
+    /// Saves an object, retrieving its serialized version from the provided transport. 
     /// </summary>
     /// <param name="id">The hash of the object.</param>
     /// <param name="sourceTransport">The transport from where to retrieve it.</param>

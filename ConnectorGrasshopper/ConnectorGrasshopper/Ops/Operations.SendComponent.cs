@@ -53,7 +53,7 @@ namespace ConnectorGrasshopper.Ops
 
     public ISpeckleKit Kit;
 
-    public SendComponent() : base("Send", "Send", "Sends data to a Speckle server (or any other provided transport).", ComponentCategories.PRIMARY_RIBBON,
+    public SendComponent() : base("Send Data", "Send", "Sends data to a Speckle server (or any other provided transport).", ComponentCategories.PRIMARY_RIBBON,
       ComponentCategories.SEND_RECEIVE)
     {
       Tracker.TrackPageview(Tracker.SEND_ADDED);
@@ -598,9 +598,9 @@ namespace ConnectorGrasshopper.Ops
       DA.SetDataList(0, OutputWrappers);
 
       ((SendComponent)Parent).CurrentComponentState = "up_to_date";
-      ((SendComponent)Parent).OutputWrappers = OutputWrappers; // ref the outputs in the parent too, so we can serialise them on write/read
+      ((SendComponent)Parent).OutputWrappers = OutputWrappers; // ref the outputs in the parent too, so we can serialize them on write/read
 
-      ((SendComponent)Parent).BaseId = BaseId; // ref the outputs in the parent too, so we can serialise them on write/read
+      ((SendComponent)Parent).BaseId = BaseId; // ref the outputs in the parent too, so we can serialize them on write/read
 
       ((SendComponent)Parent).OverallProgress = 0;
 
